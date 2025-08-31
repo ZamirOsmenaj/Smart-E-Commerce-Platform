@@ -81,6 +81,12 @@
 			<scope>runtime</scope>
 		</dependency>
 
+		<!-- Liquibase -->
+		<dependency>
+			<groupId>org.liquibase</groupId>
+			<artifactId>liquibase-core</artifactId>
+		</dependency>
+
 		<!-- Apache Lombok -->
 		<dependency>
 			<groupId>org.projectlombok</groupId>
