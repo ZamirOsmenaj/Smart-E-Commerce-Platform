@@ -1,8 +1,4 @@
 databaseChangeLog:
-  - property:
-      name: logicalFilePath
-      value: db/changelog/db.changelog-master.yaml
-
   - changeSet:
       id: 1
       author: yourname
