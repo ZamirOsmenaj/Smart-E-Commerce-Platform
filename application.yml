@@ -10,6 +10,10 @@ spring:
   liquibase:
     change-log: classpath:db/changelog/db.changelog-master.yaml
 
+  redis:
+    host: ${SPRING_REDIS_HOST}
+    port: ${SPRING_REDIS_PORT}
+
   jwt:
     secret: ${JWT_SECRET}
     expiration: ${JWT_EXPIRATION}
