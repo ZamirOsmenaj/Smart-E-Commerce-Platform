@@ -17,7 +17,7 @@ public class AuthService {
 
     public AuthResponse register(RegisterRequest request) {
         User user = userService.registerUser(request);
-        String token = jwtService.generateToken(user.getEmail());
+        String token = jwtService.generateToken(String.valueOf(user.getId()));
         return new AuthResponse(token);
     }
 
@@ -27,7 +27,7 @@ public class AuthService {
         if (!passwordEncoder.matches(request.getPassword(), user.getPasswordHash())) {
             throw new RuntimeException("Invalid credentials");
         }
-        String token = jwtService.generateToken(user.getEmail());
+        String token = jwtService.generateToken(String.valueOf(user.getId()));
         return new AuthResponse(token);
     }
 }
