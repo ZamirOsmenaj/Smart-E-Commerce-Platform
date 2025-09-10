@@ -66,3 +66,17 @@ databaseChangeLog:
             constraintName: fk_order_items_order
             referencedTableName: orders
             referencedColumnNames: id
+
+        - createTable:
+            tableName: inventory
+            columns:
+              - column:
+                  name: product_id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: available
+                  type: INT
+                  constraints:
+                    nullable: false
