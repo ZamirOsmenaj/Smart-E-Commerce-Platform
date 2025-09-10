@@ -1,5 +1,6 @@
 package com.example.ecommerce.config;
 
+import com.example.ecommerce.constants.CommonConstants;
 import com.example.ecommerce.service.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -27,8 +28,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
 
-        String header = request.getHeader("Authorization");
-        if (header == null || !header.startsWith("Bearer ")) {
+        String header = request.getHeader(CommonConstants.AUTH_HEADER);
+        if (header == null || !header.startsWith(CommonConstants.BEARER_PREFIX)) {
             filterChain.doFilter(request, response);
             return;
         }
@@ -39,7 +40,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = User
                     .withUsername(email)
-                    .password("")
+                    .password(CommonConstants.EMPTY_STRING)
                     .authorities("USER")
                     .build();
 
