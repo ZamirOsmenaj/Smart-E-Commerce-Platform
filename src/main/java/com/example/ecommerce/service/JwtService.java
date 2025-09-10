@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.Date;
+import java.util.UUID;
 import java.util.logging.Logger;
 
 @Service
@@ -64,4 +65,9 @@ public class JwtService {
                 .getBody()
                 .getSubject();
     }
+
+    public UUID extractUserId(String token) {
+        return UUID.fromString(extractSubject(token));
+    }
+
 }
