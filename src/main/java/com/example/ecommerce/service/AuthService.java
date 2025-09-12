@@ -45,9 +45,11 @@ public class AuthService {
     public AuthResponse login(LoginRequest request) {
         User user = userService.findByEmail(request.getEmail())
                 .orElseThrow(() -> new RuntimeException("User not found!"));
+
         if (!passwordEncoder.matches(request.getPassword(), user.getPasswordHash())) {
             throw new RuntimeException("Invalid credentials");
         }
+
         String token = jwtService.generateToken(String.valueOf(user.getId()));
         return new AuthResponse(token);
     }
