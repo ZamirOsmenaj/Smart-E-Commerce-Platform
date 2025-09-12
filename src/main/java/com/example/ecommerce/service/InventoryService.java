@@ -4,6 +4,7 @@ import com.example.ecommerce.domain.Inventory;
 import com.example.ecommerce.repository.InventoryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
@@ -26,6 +27,7 @@ public class InventoryService {
      * @throws RuntimeException if no inventory exists for the product
      *                          or if available stock is insufficient
      */
+    @Transactional
     public void reserveStock(UUID productId, int quantity) {
          Inventory inv = inventoryRepository.findById(productId)
                 .orElseThrow(() -> new RuntimeException("No inventory for product " + productId));
@@ -46,10 +48,11 @@ public class InventoryService {
      *
      * @throws RuntimeException if no inventory exists for the product
      */
+    @Transactional
     public void releaseStock(UUID productId, int quantity) {
         Inventory inv = inventoryRepository.findById(productId)
                 .orElseThrow(() -> new RuntimeException("No inventory for product " + productId));
-        inv.setAvailable(inv.getAvailable() - quantity);
+        inv.setAvailable(inv.getAvailable() + quantity);
         inventoryRepository.save(inv);
     }
 
