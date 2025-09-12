@@ -1,5 +1,6 @@
 package com.example.ecommerce.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 /**
@@ -11,6 +12,7 @@ import lombok.Data;
  * </p>
  */
 @Data
+@AllArgsConstructor
 public class AuthResponse {
     private String token;
 }
