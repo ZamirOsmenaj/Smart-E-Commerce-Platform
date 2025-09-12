@@ -15,6 +15,9 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Controller that manages product operations such as retrieval, creation, update, and deletion.
+ */
 @RestController
 @RequestMapping("/api/products")
 @RequiredArgsConstructor
@@ -22,26 +25,58 @@ public class ProductController {
 
     private final ProductService productService;
 
+    /**
+     * Retrieves all products.
+     *
+     * @return a list of all {@link Product} objects.
+     */
     @GetMapping
     public List<Product> getAll() {
         return productService.findAll();
     }
 
+    /**
+     * Retrieves a product by its unique identifier.
+     *
+     * @param id the UUID of the product
+     *
+     * @return the {@link Product} with the given ID
+     */
     @GetMapping("/{id}")
     public Product getById(@PathVariable UUID id) {
         return productService.findById(id);
     }
 
+    /**
+     * Creates a new product.
+     *
+     * @param product the product details to create
+     *
+     * @return the created {@link Product}
+     */
     @PostMapping
     public Product create(@RequestBody Product product) {
         return productService.create(product);
     }
 
+    /**
+     * Updates an existing product by its ID.
+     *
+     * @param id the UUID of the product to update
+     * @param product the updated product details
+     *
+     * @return the updated {@link Product}
+     */
     @PutMapping("/{id}")
     public Product update(@PathVariable UUID id, @RequestBody Product product) {
         return productService.update(id, product);
     }
 
+    /**
+     * Deletes a product by its ID.
+     *
+     * @param id the UUID of the product to delete
+     */
     @DeleteMapping("/{id}")
     public void delete(@PathVariable UUID id) {
         productService.delete(id);

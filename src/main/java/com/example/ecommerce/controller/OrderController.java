@@ -16,6 +16,9 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Controller that manages customer orders.
+ */
 @RestController
 @RequestMapping("/api/orders")
 @RequiredArgsConstructor
@@ -24,6 +27,14 @@ public class OrderController {
     private final OrderService orderService;
     private final JwtService jwtService;
 
+    /**
+     * Creates a new order for the authenticated user.
+     *
+     * @param token the JWT authorization header containing the Bearer token
+     * @param request the request containing order details
+     *
+     * @return an {@link OrderResponse} representing the created order
+     */
     @PostMapping
     public OrderResponse createOrder(
             @RequestHeader(CommonConstants.AUTH_HEADER) String token,
@@ -34,6 +45,13 @@ public class OrderController {
         return orderService.createOrder(userId, request);
     }
 
+    /**
+     * Retrieves all orders for the authenticated user.
+     *
+     * @param token the JWT authorization header containing the Bearer token
+     *
+     * @return a list of {@link OrderResponse} objects representing the user's orders
+     */
     @GetMapping
     public List<OrderResponse> getOrders(
             @RequestHeader(CommonConstants.AUTH_HEADER) String token
@@ -42,4 +60,5 @@ public class OrderController {
         UUID userId = jwtService.extractUserId(jwt);
         return orderService.getOrdersByUser(userId);
     }
+
 }
