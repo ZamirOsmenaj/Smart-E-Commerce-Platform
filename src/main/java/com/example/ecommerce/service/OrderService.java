@@ -15,6 +15,15 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+/**
+ * Service responsible for handling customer orders, including creation
+ * and retrieval of orders for a specific user.
+ *
+ * <p>
+ * Handles stock reservation via {@link InventoryService} and product lookups
+ * via {@link ProductService}.
+ * </p>
+ */
 @Service
 @RequiredArgsConstructor
 public class OrderService {
@@ -23,6 +32,26 @@ public class OrderService {
     private final InventoryService inventoryService;
     private final ProductService productService;
 
+    /**
+     * Creates a new order for a given user based on the provided request.
+     *
+     * <p>
+     * Steps:
+     * <ul>
+     *     <li>Validates product availability using {@link ProductService}.</li>
+     *     <li>Reserves stock for each item via {@link InventoryService}.</li>
+     *     <li>Calculates the total cost of the order.</li>
+     *     <li>Saves the order and its items in the database.</li>
+     * </ul>
+     * </p>
+     *
+     * @param userId  the ID of the user placing the order
+     * @param request the request containing order items and quantities
+     *
+     * @return an {@link OrderResponse} representing the created order
+     *
+     * @throws RuntimeException if product stock is insufficient
+     */
     @Transactional
     public OrderResponse createOrder(UUID userId, CreateOrderRequest request) {
         // calculate total
@@ -61,6 +90,13 @@ public class OrderService {
         return mapToResponse(order);
     }
 
+    /**
+     * Retrieves all orders placed by a specific user.
+     *
+     * @param userId the ID of the user
+     *
+     * @return a list of {@link OrderResponse} representing the user's orders
+     */
     public List<OrderResponse> getOrdersByUser(UUID userId) {
         return orderRepository.findByUserId(userId)
                 .stream()
@@ -68,6 +104,13 @@ public class OrderService {
                 .toList();
     }
 
+    /**
+     * Maps an {@link Order} entity to its corresponding {@link OrderResponse} DTO.
+     *
+     * @param order the order entity to map
+     *
+     * @return the {@link OrderResponse} representation of the order
+     */
     private OrderResponse mapToResponse(Order order) {
         return OrderResponse.builder()
                 .id(order.getId())

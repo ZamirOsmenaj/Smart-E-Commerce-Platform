@@ -9,12 +9,24 @@ import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
+/**
+ * Service responsible for managing user data, including registration
+ * and retrieval by email.
+ */
 @Service
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
+    /**
+     * Registers a new user by creating a {@link User} entity,
+     * encoding their password, and saving them to the repository.
+     *
+     * @param request the registration request containing email and password
+     *
+     * @return the saved {@link User} entity
+     */
     public User registerUser(RegisterRequest request) {
         User user = new User();
         user.setEmail(request.getEmail());
@@ -22,7 +34,15 @@ public class UserService {
         return userRepository.save(user);
     }
 
+    /**
+     * Finds a user by their email address.
+     *
+     * @param email the email of the user to find
+     *
+     * @return an {@link Optional} containing the {@link User} if found, or empty if not
+     */
     public Optional<User> findByEmail(String email) {
         return userRepository.findByEmail(email);
     }
+
 }
