@@ -21,7 +21,9 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class ProductService {
+
     private final ProductRepository productRepository;
+    private final InventoryService inventoryService;
 
     /**
      * Retrieves all products from the repository.
@@ -64,7 +66,9 @@ public class ProductService {
      */
     @CacheEvict(value = "products", allEntries = true)
     public Product create(Product product) {
-        return productRepository.save(product);
+        Product savedProduct = productRepository.save(product);
+        inventoryService.createInventory(savedProduct.getId(), product.getStock());
+        return savedProduct;
     }
 
     /**
@@ -103,6 +107,7 @@ public class ProductService {
     @CacheEvict(value = "products", key = "#id")
     public void delete(UUID id) {
         productRepository.deleteById(id);
+        inventoryService.deleteInventoryByProductId(id);
     }
 
 }

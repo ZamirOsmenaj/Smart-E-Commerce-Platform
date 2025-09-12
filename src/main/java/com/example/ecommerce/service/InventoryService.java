@@ -18,6 +18,22 @@ public class InventoryService {
 
     private final InventoryRepository inventoryRepository;
 
+    @Transactional
+    public void createInventory(UUID productId, int initialStock) {
+        Inventory inventory = Inventory.builder()
+                .productId(productId)
+                .available(initialStock)
+                .build();
+
+        inventoryRepository.save(inventory);
+    }
+
+    @Transactional
+    public void deleteInventoryByProductId(UUID productId) {
+        inventoryRepository.findByProductId(productId)
+                .ifPresent(inventoryRepository::delete);
+    }
+
     /**
      * Reserves a specified quantity of stock for a product.
      *
