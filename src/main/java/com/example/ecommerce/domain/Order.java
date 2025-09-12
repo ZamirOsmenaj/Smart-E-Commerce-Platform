@@ -17,26 +17,62 @@ import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Entity representing a customer order.
+ *
+ * <p>
+ * An order is associated with a specific user and contains multiple
+ * {@link OrderItem} entries.
+ * </p>
+ */
 @Entity
 @Table(name = "orders")
 @Data
 public class Order {
+
+    /**
+     * The unique identifier of the order.
+     */
     @Id
     @GeneratedValue
     private UUID id;
 
+    /**
+     * The identifier of the user who placed the order.
+     * Cannot be null.
+     */
     @Column(nullable = false)
     private UUID userId;
 
+    /**
+     * The total cost of the order.
+     * Cannot be null.
+     */
     @Column(nullable = false)
     private BigDecimal total;
 
+    /**
+     * The current status of the order.
+     * Defaults to {@link OrderStatus#PENDING}.
+     */
     @Enumerated(EnumType.STRING)
     private OrderStatus status = OrderStatus.PENDING;
 
-    @Column(columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP") // Optional
+    /**
+     * The timestamp when the order was created.
+     */
     private Instant createdAt = Instant.now();
 
+    /**
+     * The list of the items included in the order.
+     * Each {@link OrderItem} is associated with this order.
+     *
+     * <p>
+     * Cascade operations ensure that when an order is persisted or removed,
+     * its items are handled accordingly.
+     * </p>
+     */
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderItem> items;
+
 }
