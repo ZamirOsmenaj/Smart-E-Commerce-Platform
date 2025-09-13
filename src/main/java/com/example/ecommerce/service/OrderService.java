@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -61,7 +63,6 @@ public class OrderService {
 
         Order order = new Order();
         order.setUserId(userId);
-        order.setStatus(OrderStatus.PENDING);
 
         List<OrderItem> items = request.getItems().stream().map(reqItem -> {
             var product = productService.findById(reqItem.getProductId());
@@ -102,6 +103,12 @@ public class OrderService {
                 .stream()
                 .map(this::mapToResponse)
                 .toList();
+    }
+
+    public OrderResponse getById(UUID orderId) {
+        return orderRepository.findById(orderId)
+                .map(this::mapToResponse)
+                .orElseThrow(() -> new RuntimeException("Order not found!"));
     }
 
     /**
