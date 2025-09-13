@@ -2,7 +2,6 @@ package com.example.ecommerce.service;
 
 import com.example.ecommerce.domain.Order;
 import com.example.ecommerce.domain.OrderItem;
-import com.example.ecommerce.domain.enums.OrderStatus;
 import com.example.ecommerce.dto.CreateOrderRequest;
 import com.example.ecommerce.dto.OrderResponse;
 import com.example.ecommerce.repository.OrderRepository;
@@ -11,8 +10,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
