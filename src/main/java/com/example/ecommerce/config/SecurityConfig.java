@@ -35,6 +35,7 @@ public class SecurityConfig {
      * <p>
      * - Disables CSRF protection (since the app likely uses JWT-based authentication).<br>
      * - Allows unauthenticated access to {@code /api/auth/**} endpoints.<br>
+     * - Allows unauthenticated access to {@code /api/mock-payments/**} endpoint. <br>
      * - Requires authentication for all other endpoints.<br>
      * - Registers the {@link JwtAuthenticationFilter} to process requests
      *   before {@link UsernamePasswordAuthenticationFilter}.
@@ -51,6 +52,7 @@ public class SecurityConfig {
         http.csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/mock-payments/**").permitAll() // allow payment mock
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
