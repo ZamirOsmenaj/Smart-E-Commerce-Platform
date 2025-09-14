@@ -18,6 +18,11 @@ public class InventoryService {
 
     private final InventoryRepository inventoryRepository;
 
+    public Inventory findById(UUID productId) {
+        return inventoryRepository.findById(productId)
+                .orElseThrow(() -> new RuntimeException("Product not found in Inventory!"));
+    }
+
     @Transactional
     public void createInventory(UUID productId, int initialStock) {
         Inventory inventory = Inventory.builder()

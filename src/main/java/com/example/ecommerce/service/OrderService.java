@@ -63,7 +63,9 @@ public class OrderService {
 
         List<OrderItem> items = request.getItems().stream().map(reqItem -> {
             var product = productService.findById(reqItem.getProductId());
-            if (product.getStock() < reqItem.getQuantity()) {
+            var inventory = inventoryService.findById(reqItem.getProductId());
+
+            if (inventory.getAvailable() < reqItem.getQuantity()) {
                 throw new RuntimeException("Not enough stock for "+ product.getName());
             }
 
