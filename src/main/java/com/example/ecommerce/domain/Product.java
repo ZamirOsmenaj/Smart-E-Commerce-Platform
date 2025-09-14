@@ -56,11 +56,4 @@ public class Product implements Serializable {
     @Column(nullable = false)
     private BigDecimal price;
 
-    /**
-     * The quantity of the product available in the stock.
-     * Cannot be null.
-     */
-    @Column(nullable = false)
-    private int stock;
-
 }

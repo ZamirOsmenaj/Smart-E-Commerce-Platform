@@ -1,6 +1,7 @@
 package com.example.ecommerce.controller;
 
 import com.example.ecommerce.domain.Product;
+import com.example.ecommerce.dto.CreateProductRequest;
 import com.example.ecommerce.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -50,13 +51,13 @@ public class ProductController {
     /**
      * Creates a new product.
      *
-     * @param product the product details to create
+     * @param request the product details to create
      *
      * @return the created {@link Product}
      */
     @PostMapping
-    public Product create(@RequestBody Product product) {
-        return productService.create(product);
+    public Product create(@RequestBody CreateProductRequest request) {
+        return productService.create(request);
     }
 
     /**
