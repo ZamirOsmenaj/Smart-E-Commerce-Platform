@@ -31,7 +31,7 @@ public class PaymentService {
      * @return true if payment approved.
      */
     @Transactional
-    public boolean processPayment(UUID orderId) {
+    public void processPayment(UUID orderId) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("Order not found!"));
 
@@ -52,7 +52,6 @@ public class PaymentService {
         if ("APPROVED".equalsIgnoreCase(status)) {
             order.setStatus(OrderStatus.PAID);
             orderRepository.save(order);
-            return true;
         } else {
             // payment declined => cancel order and release reserved stock
             order.setStatus(OrderStatus.CANCELLED);
@@ -61,7 +60,6 @@ public class PaymentService {
             for (OrderItem item : order.getItems()) {
                 inventoryService.releaseStock(item.getProductId(), item.getQuantity());
             }
-            return false;
         }
     }
 

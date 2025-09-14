@@ -78,7 +78,7 @@ public class OrderController {
             throw new RuntimeException("You do not own this order!");
         }
 
-        boolean approved = paymentService.processPayment(orderId);
+        paymentService.processPayment(orderId);
 
         return orderService.getById(orderId);
     }
