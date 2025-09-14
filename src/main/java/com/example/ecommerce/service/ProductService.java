@@ -107,7 +107,7 @@ public class ProductService {
     @CacheEvict(value = "products", key = "#id")
     public void delete(UUID id) {
         productRepository.deleteById(id);
-        inventoryService.deleteInventoryByProductId(id);
+        inventoryService.deleteInventoryById(id);
     }
 
 }

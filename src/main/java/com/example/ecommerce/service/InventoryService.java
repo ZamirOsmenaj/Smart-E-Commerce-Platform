@@ -29,9 +29,8 @@ public class InventoryService {
     }
 
     @Transactional
-    public void deleteInventoryByProductId(UUID productId) {
-        inventoryRepository.findByProductId(productId)
-                .ifPresent(inventoryRepository::delete);
+    public void deleteInventoryById(UUID productId) {
+        inventoryRepository.deleteById(productId);
     }
 
     /**
