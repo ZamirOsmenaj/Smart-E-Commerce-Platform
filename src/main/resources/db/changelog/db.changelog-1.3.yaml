@@ -6,3 +6,11 @@ databaseChangeLog:
         - dropColumn:
             columnName: stock
             tableName: products
+
+        - dropDefaultValue:
+            columnName: created_at
+            tableName: users
+
+        - dropDefaultValue:
+            columnName: created_at
+            tableName: orders
