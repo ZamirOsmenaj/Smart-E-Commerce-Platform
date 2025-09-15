@@ -1,8 +1,10 @@
 package com.example.ecommerce.repository;
 
 import com.example.ecommerce.domain.Order;
+import com.example.ecommerce.domain.enums.OrderStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -24,4 +26,21 @@ public interface OrderRepository extends JpaRepository<Order, UUID> {
      *         the list will be empty if the user has no orders
      */
     List<Order> findByUserId(UUID userId);
+
+    /**
+     * Finds all orders matching the given status that were created before
+     * the specified timestamp.
+     *
+     * <p>
+     * Typically used by scheduled jobs to identify stale orders —
+     * for example, pending orders that have not been paid within a
+     * configured time limit so they can be cancelled or removed.
+     * </p>
+     *
+     * @param status the order status to filter by (e.g., {@link OrderStatus#PENDING})
+     * @param before the cutoff timestamp; only orders created before this instant are returned
+     *
+     * @return a list of orders matching the status and creation time criteria
+     */
+    List<Order> findByStatusAndCreatedAtBefore(OrderStatus status, Instant before);
 }
