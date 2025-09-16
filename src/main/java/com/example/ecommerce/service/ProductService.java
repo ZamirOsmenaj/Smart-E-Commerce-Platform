@@ -2,6 +2,7 @@ package com.example.ecommerce.service;
 
 import com.example.ecommerce.domain.Product;
 import com.example.ecommerce.dto.CreateProductRequest;
+import com.example.ecommerce.factory.ProductFactory;
 import com.example.ecommerce.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
@@ -67,11 +68,7 @@ public class ProductService {
      */
     @CacheEvict(value = "products", allEntries = true)
     public Product create(CreateProductRequest request) {
-        Product product = Product.builder()
-                .name(request.getName())
-                .description(request.getDescription())
-                .price(request.getPrice())
-                .build();
+        Product product = ProductFactory.createNewProduct(request.getName(), request.getDescription(), request.getPrice());
         Product savedProduct = productRepository.save(product);
         inventoryService.createInventory(savedProduct.getId(), request.getStock());
         return savedProduct;

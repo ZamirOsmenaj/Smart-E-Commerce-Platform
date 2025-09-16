@@ -61,12 +61,12 @@ public class Order {
      * Defaults to {@link OrderStatus#PENDING}.
      */
     @Enumerated(EnumType.STRING)
-    private OrderStatus status = OrderStatus.PENDING;
+    private OrderStatus status;
 
     /**
      * The timestamp when the order was created.
      */
-    private Instant createdAt = Instant.now();
+    private Instant createdAt;
 
     /**
      * The list of the items included in the order.

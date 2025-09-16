@@ -47,6 +47,6 @@ public class User {
     /**
      * The timestamp when the user account was created.
      */
-    private Instant createdAt = Instant.now();
+    private Instant createdAt;
 
 }

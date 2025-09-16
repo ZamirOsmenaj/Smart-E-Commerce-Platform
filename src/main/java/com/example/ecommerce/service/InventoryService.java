@@ -1,6 +1,7 @@
 package com.example.ecommerce.service;
 
 import com.example.ecommerce.domain.Inventory;
+import com.example.ecommerce.factory.InventoryFactory;
 import com.example.ecommerce.repository.InventoryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -25,11 +26,7 @@ public class InventoryService {
 
     @Transactional
     public void createInventory(UUID productId, int initialStock) {
-        Inventory inventory = Inventory.builder()
-                .productId(productId)
-                .available(initialStock)
-                .build();
-
+        Inventory inventory = InventoryFactory.createInventoryForProduct(productId, initialStock);
         inventoryRepository.save(inventory);
     }
 

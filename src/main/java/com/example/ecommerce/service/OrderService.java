@@ -4,6 +4,8 @@ import com.example.ecommerce.domain.Order;
 import com.example.ecommerce.domain.OrderItem;
 import com.example.ecommerce.dto.CreateOrderRequest;
 import com.example.ecommerce.dto.OrderResponse;
+import com.example.ecommerce.factory.OrderFactory;
+import com.example.ecommerce.factory.OrderItemFactory;
 import com.example.ecommerce.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -58,8 +60,7 @@ public class OrderService {
             BigDecimal total = BigDecimal.ZERO;
         };
 
-        Order order = new Order();
-        order.setUserId(userId);
+        Order tempOrder = new Order();
 
         List<OrderItem> items = request.getItems().stream().map(reqItem -> {
             var product = productService.findById(reqItem.getProductId());
@@ -74,18 +75,14 @@ public class OrderService {
             BigDecimal itemTotal = product.getPrice().multiply(BigDecimal.valueOf(reqItem.getQuantity()));
             ref.total = ref.total.add(itemTotal);
 
-            return OrderItem.builder()
-                    .order(order)
-                    .productId(product.getId())
-                    .quantity(reqItem.getQuantity())
-                    .price(product.getPrice())
-                    .build();
+            return OrderItemFactory.createNewOrderItem(tempOrder, product.getId(), reqItem.getQuantity(), product.getPrice());
         }).collect(Collectors.toList());
 
-        order.setItems(items);
-        order.setTotal(ref.total);
-
+        Order order = OrderFactory.createNewOrder(userId, ref.total, items);
         orderRepository.save(order);
+
+        // Set correct order reference for all items
+        items.forEach(item -> item.setOrder(order));
 
         return mapToResponse(order);
     }
