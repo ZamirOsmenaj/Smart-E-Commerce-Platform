@@ -8,7 +8,6 @@ import com.example.ecommerce.service.OrderService;
 import com.example.ecommerce.service.PaymentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -62,25 +61,6 @@ public class OrderController {
         String jwt = token.replace(CommonConstants.BEARER_PREFIX, CommonConstants.EMPTY_STRING);
         UUID userId = jwtService.extractUserId(jwt);
         return orderService.getOrdersByUser(userId);
-    }
-
-    @PostMapping("/{id}/pay")
-    public OrderResponse payOrder(
-            @RequestHeader(CommonConstants.AUTH_HEADER) String authHeader,
-            @PathVariable("id") UUID orderId) {
-
-        String jwt = authHeader.replace(CommonConstants.BEARER_PREFIX, CommonConstants.EMPTY_STRING);
-        UUID userId = jwtService.extractUserId(jwt);
-
-        // fetch order and verify ownership or throw
-        OrderResponse order = orderService.getById(orderId);
-        if (!order.getUserId().equals(userId)) {
-            throw new RuntimeException("You do not own this order!");
-        }
-
-        paymentService.processPayment(orderId);
-
-        return orderService.getById(orderId);
     }
 
 }
