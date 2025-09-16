@@ -40,8 +40,8 @@ public class OrderController {
     @PostMapping
     public OrderResponse createOrder(
             @RequestHeader(CommonConstants.AUTH_HEADER) String token,
-            @RequestBody CreateOrderRequest request
-            ) {
+            @RequestBody CreateOrderRequest request) {
+
         String jwt = token.replace(CommonConstants.BEARER_PREFIX, CommonConstants.EMPTY_STRING);
         UUID userId = jwtService.extractUserId(jwt);
         return orderService.createOrder(userId, request);
@@ -56,8 +56,8 @@ public class OrderController {
      */
     @GetMapping
     public List<OrderResponse> getOrders(
-            @RequestHeader(CommonConstants.AUTH_HEADER) String token
-    ) {
+            @RequestHeader(CommonConstants.AUTH_HEADER) String token) {
+
         String jwt = token.replace(CommonConstants.BEARER_PREFIX, CommonConstants.EMPTY_STRING);
         UUID userId = jwtService.extractUserId(jwt);
         return orderService.getOrdersByUser(userId);
