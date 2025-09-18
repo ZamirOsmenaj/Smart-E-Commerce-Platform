@@ -1,9 +1,9 @@
 package com.example.ecommerce.service;
 
 import com.example.ecommerce.domain.Order;
-import com.example.ecommerce.domain.OrderItem;
 import com.example.ecommerce.domain.enums.OrderStatus;
 import com.example.ecommerce.dto.PaymentResponseDTO;
+import com.example.ecommerce.observer.OrderStatusPublisher;
 import com.example.ecommerce.payment.PaymentStrategy;
 import com.example.ecommerce.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +27,7 @@ public class PaymentService {
      */
     private final Map<String, PaymentStrategy> strategies;
     private final OrderRepository orderRepository;
-    private final InventoryService inventoryService;
+    private final OrderStatusPublisher orderStatusPublisher;
 
     /**
      * Attempts to process payment for the given orderId.
@@ -43,7 +43,8 @@ public class PaymentService {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("Order not found!"));
 
-        if (order.getStatus() != OrderStatus.PENDING) {
+        OrderStatus oldStatus = order.getStatus();
+        if (oldStatus != OrderStatus.PENDING) {
             throw new RuntimeException("Order is not in PENDING state!");
         }
 
@@ -53,19 +54,14 @@ public class PaymentService {
         }
 
         PaymentResponseDTO response = strategy.processPayment(order);
+        OrderStatus newStatus = response.getOrderStatus();
 
-        if ("PAID".equalsIgnoreCase(response.getOrderStatus().toString())) {
-            order.setStatus(OrderStatus.PAID);
-            orderRepository.save(order);
-        } else {
-            // payment declined => cancel order and release reserved stock
-            order.setStatus(OrderStatus.CANCELLED);
-            orderRepository.save(order);
+        // Update order status
+        order.setStatus(newStatus);
+        orderRepository.save(order);
 
-            for (OrderItem item : order.getItems()) {
-                inventoryService.releaseStock(item.getProductId(), item.getQuantity());
-            }
-        }
+        // Notify observers of status change
+        orderStatusPublisher.notifyStatusChange(order, oldStatus, newStatus);
 
         return response;
     }
