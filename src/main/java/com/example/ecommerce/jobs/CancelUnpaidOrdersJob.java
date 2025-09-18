@@ -1,10 +1,9 @@
 package com.example.ecommerce.jobs;
 
 import com.example.ecommerce.domain.Order;
-import com.example.ecommerce.domain.OrderItem;
 import com.example.ecommerce.domain.enums.OrderStatus;
+import com.example.ecommerce.observer.OrderStatusPublisher;
 import com.example.ecommerce.repository.OrderRepository;
-import com.example.ecommerce.service.InventoryService;
 import lombok.RequiredArgsConstructor;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
@@ -35,7 +34,7 @@ import java.util.List;
 public class CancelUnpaidOrdersJob implements Job {
 
     private final OrderRepository orderRepository;
-    private final InventoryService inventoryService;
+    private final OrderStatusPublisher orderStatusPublisher;
 
     @Override
     public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
@@ -44,12 +43,12 @@ public class CancelUnpaidOrdersJob implements Job {
         List<Order> toCancel = orderRepository.findByStatusAndCreatedAtBefore(OrderStatus.PENDING, cutOff);
 
         for (Order order : toCancel) {
+            OrderStatus oldStatus = order.getStatus();
             order.setStatus(OrderStatus.CANCELLED);
             orderRepository.save(order);
 
-            order.getItems().forEach(item ->
-                    inventoryService.releaseStock(item.getProductId(), item.getQuantity())
-            );
+            // Notify observers of the status change - they will handle inventory release and notifications
+            orderStatusPublisher.notifyStatusChange(order, oldStatus, OrderStatus.CANCELLED);
         }
     }
 
