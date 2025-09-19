@@ -7,6 +7,7 @@ import com.example.ecommerce.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -28,6 +29,7 @@ public class UserService {
      *
      * @return the saved {@link User} entity
      */
+    @Transactional
     public User registerUser(RegisterRequestDTO request) {
         User user = UserFactory.createNewUser(request.getEmail(), passwordEncoder.encode(request.getPassword()));
         return userRepository.save(user);
