@@ -1,7 +1,7 @@
 package com.example.ecommerce.controller;
 
 import com.example.ecommerce.constants.CommonConstants;
-import com.example.ecommerce.dto.OrderResponse;
+import com.example.ecommerce.dto.OrderResponseDTO;
 import com.example.ecommerce.dto.PaymentResponseDTO;
 import com.example.ecommerce.service.JwtService;
 import com.example.ecommerce.service.OrderService;
@@ -46,7 +46,7 @@ public class PaymentController {
         String jwt = authHeader.replace(CommonConstants.BEARER_PREFIX, CommonConstants.EMPTY_STRING);
         UUID userId = jwtService.extractUserId(jwt);
 
-        OrderResponse order = orderService.getById(orderId);
+        OrderResponseDTO order = orderService.getById(orderId);
         if (!order.getUserId().equals(userId)) {
             throw new RuntimeException("You do not own this order!");
         }

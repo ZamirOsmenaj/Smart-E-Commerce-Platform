@@ -35,8 +35,9 @@ public class PaymentService {
      * If declined -> sets order status to CANCELLED and releases reserved stock.
      *
      * @param orderId
+     * @param provider
      *
-     * @return true if payment approved.
+     * @return {@link PaymentResponseDTO}
      */
     @Transactional
     public PaymentResponseDTO pay(UUID orderId, String provider) {
@@ -65,5 +66,4 @@ public class PaymentService {
 
         return response;
     }
-
 }
