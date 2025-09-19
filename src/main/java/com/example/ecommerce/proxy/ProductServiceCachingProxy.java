@@ -16,6 +16,8 @@ import java.util.UUID;
 /**
  * Caching Proxy that adds Redis-based caching to ProductService.
  * This is a PROXY PATTERN - it controls access and adds caching without changing the core functionality.
+ * <p>
+ * Utilizes caching to optimize performance for frequently accessed products.
  */
 @Component
 @RequiredArgsConstructor
@@ -92,10 +94,11 @@ public class ProductServiceCachingProxy implements ProductServiceInterface {
     public Product create(CreateProductRequestDTO request) {
         Product product = delegate.create(request);
         
-        // PROXY BEHAVIOR: Invalidate cache after modification
-        invalidateListCache();
-        cacheProduct(product);
+        // GRANULAR APPROACH: Cache new product, invalidate only list
+        cacheProduct(product);        // Cache the new product for future findById()
+        invalidateListCache();        // List cache is stale (missing new product)
         
+        log.debug("PROXY: Created product {} - cached individually, invalidated list", product.getId());
         return product;
     }
 
@@ -103,10 +106,11 @@ public class ProductServiceCachingProxy implements ProductServiceInterface {
     public Product update(UUID id, Product updated) {
         Product product = delegate.update(id, updated);
         
-        // PROXY BEHAVIOR: Update cache after modification
-        cacheProduct(product);
-        invalidateListCache();
+        // GRANULAR APPROACH: Update specific caches
+        cacheProduct(product);        // Update individual product cache
+        invalidateListCache();        // List cache contains old version
         
+        log.debug("PROXY: Updated product {} - refreshed individual cache, invalidated list", id);
         return product;
     }
 
@@ -114,14 +118,16 @@ public class ProductServiceCachingProxy implements ProductServiceInterface {
     public void delete(UUID id) {
         delegate.delete(id);
         
-        // PROXY BEHAVIOR: Remove from cache after deletion
-        String cacheKey = PRODUCT_CACHE_PREFIX + id;
-        redisTemplate.delete(cacheKey);
-        log.debug("PROXY: Removed product from cache: {}", id);
+        // GRANULAR APPROACH: Remove specific caches
+        invalidateProductCache(id);   // Remove individual product cache
+        invalidateListCache();        // List cache contains deleted product
         
-        invalidateListCache();
+        log.debug("PROXY: Deleted product {} - removed individual cache, invalidated list", id);
     }
     
+    /**
+     * Cache a single product.
+     */
     private void cacheProduct(Product product) {
         try {
             String cacheKey = PRODUCT_CACHE_PREFIX + product.getId();
@@ -133,6 +139,19 @@ public class ProductServiceCachingProxy implements ProductServiceInterface {
         }
     }
     
+    /**
+     * Remove a single product from cache.
+     */
+    private void invalidateProductCache(UUID productId) {
+        String cacheKey = PRODUCT_CACHE_PREFIX + productId;
+        redisTemplate.delete(cacheKey);
+        log.debug("PROXY: Invalidated product cache: {}", productId);
+    }
+    
+    /**
+     * Invalidate the products list cache.
+     * This is necessary when the list contents change (create/update/delete operations).
+     */
     private void invalidateListCache() {
         redisTemplate.delete(PRODUCTS_LIST_KEY);
         log.debug("PROXY: Invalidated products list cache");
