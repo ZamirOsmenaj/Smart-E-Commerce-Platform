@@ -1,5 +1,6 @@
 package com.example.ecommerce.service;
 
+import com.example.ecommerce.decorator.ProductServiceInterface;
 import com.example.ecommerce.domain.Product;
 import com.example.ecommerce.dto.CreateProductRequest;
 import com.example.ecommerce.factory.ProductFactory;
@@ -22,7 +23,7 @@ import java.util.UUID;
  */
 @Service
 @RequiredArgsConstructor
-public class ProductService {
+public class ProductService implements ProductServiceInterface {
 
     private final ProductRepository productRepository;
     private final InventoryService inventoryService;
@@ -32,6 +33,7 @@ public class ProductService {
      *
      * @return a list of all {@link Product} entities
      */
+    @Override
     public List<Product> findAll() {
         return productRepository.findAll();
     }
@@ -50,6 +52,7 @@ public class ProductService {
      * @throws RuntimeException if no product with the given ID exists
      */
     @Cacheable(value = "products", key = "#id")
+    @Override
     public Product findById(UUID id) {
         return productRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Product not found!"));
@@ -67,6 +70,7 @@ public class ProductService {
      * @return the saved {@link Product} entity
      */
     @CacheEvict(value = "products", allEntries = true)
+    @Override
     public Product create(CreateProductRequest request) {
         Product product = ProductFactory.createNewProduct(request.getName(), request.getDescription(), request.getPrice());
         Product savedProduct = productRepository.save(product);
@@ -89,6 +93,7 @@ public class ProductService {
      * @throws RuntimeException if no product with the given ID exists
      */
     @CacheEvict(value = "products", key = "#id")
+    @Override
     public Product update(UUID id, Product updated) {
         Product product = findById(id);
         product.setName(updated.getName());
@@ -107,6 +112,7 @@ public class ProductService {
      * @param id the UUID of the product to delete
      */
     @CacheEvict(value = "products", key = "#id")
+    @Override
     public void delete(UUID id) {
         productRepository.deleteById(id);
         inventoryService.deleteInventoryById(id);
