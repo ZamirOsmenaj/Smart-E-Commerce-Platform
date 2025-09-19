@@ -10,11 +10,8 @@ import java.util.UUID;
 
 /**
  * Repository interface for mapping {@link Order} entities.
- *
  * <p>
- *  Extends {@link JpaRepository} to obtain standard CRUD operations,
- *  paging, and sorting for {@link Order} instances.
- * </p>
+ *  Extends {@link JpaRepository} to obtain standard CRUD operations.
  */
 public interface OrderRepository extends JpaRepository<Order, UUID> {
     /**

@@ -1,8 +1,8 @@
 package com.example.ecommerce.controller;
 
 import com.example.ecommerce.constants.CommonConstants;
-import com.example.ecommerce.dto.CreateOrderRequest;
-import com.example.ecommerce.dto.OrderResponse;
+import com.example.ecommerce.dto.CreateOrderRequestDTO;
+import com.example.ecommerce.dto.OrderResponseDTO;
 import com.example.ecommerce.service.JwtService;
 import com.example.ecommerce.service.OrderService;
 import com.example.ecommerce.service.PaymentService;
@@ -35,12 +35,12 @@ public class OrderController {
      * @param token the JWT authorization header containing the Bearer token
      * @param request the request containing order details
      *
-     * @return an {@link OrderResponse} representing the created order
+     * @return an {@link OrderResponseDTO} representing the created order
      */
     @PostMapping
-    public OrderResponse createOrder(
+    public OrderResponseDTO createOrder(
             @RequestHeader(CommonConstants.AUTH_HEADER) String token,
-            @RequestBody CreateOrderRequest request) {
+            @RequestBody CreateOrderRequestDTO request) {
 
         String jwt = token.replace(CommonConstants.BEARER_PREFIX, CommonConstants.EMPTY_STRING);
         UUID userId = jwtService.extractUserId(jwt);
@@ -52,15 +52,14 @@ public class OrderController {
      *
      * @param token the JWT authorization header containing the Bearer token
      *
-     * @return a list of {@link OrderResponse} objects representing the user's orders
+     * @return a list of {@link OrderResponseDTO} objects representing the user's orders
      */
     @GetMapping
-    public List<OrderResponse> getOrders(
+    public List<OrderResponseDTO> getOrders(
             @RequestHeader(CommonConstants.AUTH_HEADER) String token) {
 
         String jwt = token.replace(CommonConstants.BEARER_PREFIX, CommonConstants.EMPTY_STRING);
         UUID userId = jwtService.extractUserId(jwt);
         return orderService.getOrdersByUser(userId);
     }
-
 }

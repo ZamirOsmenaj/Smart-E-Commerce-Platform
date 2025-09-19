@@ -3,8 +3,8 @@ package com.example.ecommerce.service;
 import com.example.ecommerce.proxy.ProductServiceInterface;
 import com.example.ecommerce.domain.Order;
 import com.example.ecommerce.domain.OrderItem;
-import com.example.ecommerce.dto.CreateOrderRequest;
-import com.example.ecommerce.dto.OrderResponse;
+import com.example.ecommerce.dto.CreateOrderRequestDTO;
+import com.example.ecommerce.dto.OrderResponseDTO;
 import com.example.ecommerce.factory.OrderFactory;
 import com.example.ecommerce.factory.OrderItemFactory;
 import com.example.ecommerce.repository.OrderRepository;
@@ -21,11 +21,9 @@ import java.util.stream.Collectors;
 /**
  * Service responsible for handling customer orders, including creation
  * and retrieval of orders for a specific user.
- *
  * <p>
  * Handles stock reservation via {@link InventoryService} and product lookups
  * via {@link ProductService}.
- * </p>
  */
 @Service
 @RequiredArgsConstructor
@@ -51,12 +49,12 @@ public class OrderService {
      * @param userId  the ID of the user placing the order
      * @param request the request containing order items and quantities
      *
-     * @return an {@link OrderResponse} representing the created order
+     * @return an {@link OrderResponseDTO} representing the created order
      *
      * @throws RuntimeException if product stock is insufficient
      */
     @Transactional
-    public OrderResponse createOrder(UUID userId, CreateOrderRequest request) {
+    public OrderResponseDTO createOrder(UUID userId, CreateOrderRequestDTO request) {
         log.info("Creating order for user: {} with {} items", userId, request.getItems().size());
         
         BigDecimal total = BigDecimal.ZERO;
@@ -106,36 +104,36 @@ public class OrderService {
      *
      * @param userId the ID of the user
      *
-     * @return a list of {@link OrderResponse} representing the user's orders
+     * @return a list of {@link OrderResponseDTO} representing the user's orders
      */
-    public List<OrderResponse> getOrdersByUser(UUID userId) {
+    public List<OrderResponseDTO> getOrdersByUser(UUID userId) {
         return orderRepository.findByUserId(userId)
                 .stream()
                 .map(this::mapToResponse)
                 .toList();
     }
 
-    public OrderResponse getById(UUID orderId) {
+    public OrderResponseDTO getById(UUID orderId) {
         return orderRepository.findById(orderId)
                 .map(this::mapToResponse)
                 .orElseThrow(() -> new RuntimeException("Order not found!"));
     }
 
     /**
-     * Maps an {@link Order} entity to its corresponding {@link OrderResponse} DTO.
+     * Maps an {@link Order} entity to its corresponding {@link OrderResponseDTO} DTO.
      *
      * @param order the order entity to map
      *
-     * @return the {@link OrderResponse} representation of the order
+     * @return the {@link OrderResponseDTO} representation of the order
      */
-    private OrderResponse mapToResponse(Order order) {
-        return OrderResponse.builder()
+    private OrderResponseDTO mapToResponse(Order order) {
+        return OrderResponseDTO.builder()
                 .id(order.getId())
                 .userId(order.getUserId())
                 .status(order.getStatus())
                 .total(order.getTotal())
                 .items(order.getItems().stream().map(i ->
-                        OrderResponse.OrderItemResponse.builder()
+                        OrderResponseDTO.OrderItemResponse.builder()
                                 .productId(i.getProductId())
                                 .quantity(i.getQuantity())
                                 .price(i.getPrice())
@@ -143,5 +141,4 @@ public class OrderService {
                 ).toList())
                 .build();
     }
-
 }

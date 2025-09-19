@@ -22,11 +22,9 @@ import java.util.UUID;
 
 /**
  * Entity representing a customer order.
- *
  * <p>
  * An order is associated with a specific user and contains multiple
  * {@link OrderItem} entries.
- * </p>
  */
 @Entity
 @Table(name = "orders")
@@ -79,5 +77,4 @@ public class Order {
      */
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderItem> items;
-
 }

@@ -10,14 +10,12 @@ import java.util.UUID;
 
 /**
  * Response payload representing an order.
- *
  * <p>
  * Provides order details.
- * </p>
  */
 @Data
 @Builder
-public class OrderResponse {
+public class OrderResponseDTO {
     private UUID id;
     private UUID userId;
     private BigDecimal total;
@@ -25,7 +23,7 @@ public class OrderResponse {
     private List<OrderItemResponse> items;
 
     /**
-     * Nested DTO representing an item within an {@link OrderResponse}.
+     * Nested DTO representing an item within an {@link OrderResponseDTO}.
      */
     @Data
     @Builder
