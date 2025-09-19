@@ -5,7 +5,6 @@ import com.example.ecommerce.dto.CreateOrderRequestDTO;
 import com.example.ecommerce.dto.OrderResponseDTO;
 import com.example.ecommerce.service.JwtService;
 import com.example.ecommerce.service.OrderService;
-import com.example.ecommerce.service.PaymentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -27,7 +26,6 @@ public class OrderController {
 
     private final OrderService orderService;
     private final JwtService jwtService;
-    private final PaymentService paymentService;
 
     /**
      * Creates a new order for the authenticated user.
