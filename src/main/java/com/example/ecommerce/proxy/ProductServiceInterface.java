@@ -1,4 +1,4 @@
-package com.example.ecommerce.decorator;
+package com.example.ecommerce.proxy;
 
 import com.example.ecommerce.domain.Product;
 import com.example.ecommerce.dto.CreateProductRequest;
