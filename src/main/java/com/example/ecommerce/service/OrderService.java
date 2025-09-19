@@ -1,5 +1,6 @@
 package com.example.ecommerce.service;
 
+import com.example.ecommerce.proxy.ProductServiceInterface;
 import com.example.ecommerce.domain.Order;
 import com.example.ecommerce.domain.OrderItem;
 import com.example.ecommerce.dto.CreateOrderRequest;
@@ -8,6 +9,7 @@ import com.example.ecommerce.factory.OrderFactory;
 import com.example.ecommerce.factory.OrderItemFactory;
 import com.example.ecommerce.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,15 +29,15 @@ import java.util.stream.Collectors;
  */
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class OrderService {
 
     private final OrderRepository orderRepository;
     private final InventoryService inventoryService;
-    private final ProductService productService;
+    private final ProductServiceInterface productService;
 
     /**
      * Creates a new order for a given user based on the provided request.
-     *
      * <p>
      * Steps:
      * <ul>
@@ -55,13 +57,16 @@ public class OrderService {
      */
     @Transactional
     public OrderResponse createOrder(UUID userId, CreateOrderRequest request) {
-        // calculate total
-        var ref = new Object() {
-            BigDecimal total = BigDecimal.ZERO;
-        };
+        log.info("Creating order for user: {} with {} items", userId, request.getItems().size());
+        
+        BigDecimal total = BigDecimal.ZERO;
 
-        Order tempOrder = new Order();
+        // Create the order first without items
+        Order order = OrderFactory.createNewOrder(userId, BigDecimal.ZERO, null);
+        log.debug("Created order object for user: {}", userId);
 
+        // Create items and calculate total
+        Order finalOrder = order;
         List<OrderItem> items = request.getItems().stream().map(reqItem -> {
             var product = productService.findById(reqItem.getProductId());
             var inventory = inventoryService.findById(reqItem.getProductId());
@@ -71,18 +76,27 @@ public class OrderService {
             }
 
             inventoryService.reserveStock(product.getId(), reqItem.getQuantity());
+            log.debug("Reserved {} units of product: {}", reqItem.getQuantity(), product.getId());
 
-            BigDecimal itemTotal = product.getPrice().multiply(BigDecimal.valueOf(reqItem.getQuantity()));
-            ref.total = ref.total.add(itemTotal);
-
-            return OrderItemFactory.createNewOrderItem(tempOrder, product.getId(), reqItem.getQuantity(), product.getPrice());
+            return OrderItemFactory.createNewOrderItem(finalOrder, product.getId(), reqItem.getQuantity(), product.getPrice());
         }).collect(Collectors.toList());
 
-        Order order = OrderFactory.createNewOrder(userId, ref.total, items);
-        orderRepository.save(order);
+        // Calculate total from items
+        total = items.stream()
+                .map(item -> item.getPrice().multiply(BigDecimal.valueOf(item.getQuantity())))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        // Set correct order reference for all items
-        items.forEach(item -> item.setOrder(order));
+        // Set the calculated total and items
+        order.setTotal(total);
+        order.setItems(items);
+        
+        log.debug("Order prepared with total: {} and {} items", total, items.size());
+        
+        // Save the order with all items (cascade will handle the items)
+        order = orderRepository.save(order);
+        
+        log.info("Successfully created order: {} for user: {} with total: {}", 
+                order.getId(), userId, total);
 
         return mapToResponse(order);
     }
