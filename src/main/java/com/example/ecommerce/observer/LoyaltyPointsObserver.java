@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+import java.util.UUID;
 
 /**
  * Observer that manages loyalty points based on order status changes.
@@ -48,12 +49,12 @@ public class LoyaltyPointsObserver implements OrderStatusObserver {
         return orderTotal.intValue();
     }
     
-    private void awardLoyaltyPoints(java.util.UUID userId, int points) {
+    private void awardLoyaltyPoints(UUID userId, int points) {
         // In real implementation: loyaltyService.addPoints(userId, points);
         log.debug("Would award {} points to user {}", points, userId);
     }
     
-    private void removeLoyaltyPoints(java.util.UUID userId, int points) {
+    private void removeLoyaltyPoints(UUID userId, int points) {
         // In real implementation: loyaltyService.removePoints(userId, points);
         log.debug("Would remove {} points from user {}", points, userId);
     }
