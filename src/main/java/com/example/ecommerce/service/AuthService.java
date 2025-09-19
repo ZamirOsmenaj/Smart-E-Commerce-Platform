@@ -1,9 +1,9 @@
 package com.example.ecommerce.service;
 
 import com.example.ecommerce.domain.User;
-import com.example.ecommerce.dto.AuthResponse;
-import com.example.ecommerce.dto.LoginRequest;
-import com.example.ecommerce.dto.RegisterRequest;
+import com.example.ecommerce.dto.AuthResponseDTO;
+import com.example.ecommerce.dto.LoginRequestDTO;
+import com.example.ecommerce.dto.RegisterRequestDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class AuthService {
+
     private final JwtService jwtService;
     private final UserService userService;
     private final PasswordEncoder passwordEncoder;
@@ -24,12 +25,14 @@ public class AuthService {
      *
      * @param request the registration request containing user credentials
      *
-     * @return an {@link AuthResponse} containing the JWT token for the newly registered user
+     * @return an {@link AuthResponseDTO} containing the JWT token for the newly registered user
      */
-    public AuthResponse register(RegisterRequest request) {
+    public AuthResponseDTO register(RegisterRequestDTO request) {
         User user = userService.registerUser(request);
+
+        // Generate token immediately - user is logged in after registration
         String token = jwtService.generateToken(String.valueOf(user.getId()));
-        return new AuthResponse(token);
+        return new AuthResponseDTO(token);
     }
 
     /**
@@ -38,11 +41,11 @@ public class AuthService {
      *
      * @param request the login request containing user credentials
      *
-     * @return an {@link AuthResponse} containing the JWT token for the authenticated user
+     * @return an {@link AuthResponseDTO} containing the JWT token for the authenticated user
      *
      * @throws RuntimeException if the user does not exist or credentials are invalid
      */
-    public AuthResponse login(LoginRequest request) {
+    public AuthResponseDTO login(LoginRequestDTO request) {
         User user = userService.findByEmail(request.getEmail())
                 .orElseThrow(() -> new RuntimeException("User not found!"));
 
@@ -51,7 +54,6 @@ public class AuthService {
         }
 
         String token = jwtService.generateToken(String.valueOf(user.getId()));
-        return new AuthResponse(token);
+        return new AuthResponseDTO(token);
     }
-
 }

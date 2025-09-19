@@ -1,8 +1,8 @@
 package com.example.ecommerce.controller;
 
-import com.example.ecommerce.dto.AuthResponse;
-import com.example.ecommerce.dto.LoginRequest;
-import com.example.ecommerce.dto.RegisterRequest;
+import com.example.ecommerce.dto.AuthResponseDTO;
+import com.example.ecommerce.dto.LoginRequestDTO;
+import com.example.ecommerce.dto.RegisterRequestDTO;
 import com.example.ecommerce.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,10 +24,10 @@ public class AuthController {
      *
      * @param request the registration details
      *
-     * @return an {@link AuthResponse}
+     * @return an {@link AuthResponseDTO}
      */
     @PostMapping("/register")
-    public AuthResponse register(@RequestBody RegisterRequest request) {
+    public AuthResponseDTO register(@RequestBody RegisterRequestDTO request) {
         return authService.register(request);
     }
 
@@ -36,11 +36,10 @@ public class AuthController {
      *
      * @param request the login request containing user credentials
      *
-     * @return an {@link AuthResponse}
+     * @return an {@link AuthResponseDTO}
      */
     @PostMapping("/login")
-    public AuthResponse login(@RequestBody LoginRequest request) {
+    public AuthResponseDTO login(@RequestBody LoginRequestDTO request) {
         return authService.login(request);
     }
-
 }

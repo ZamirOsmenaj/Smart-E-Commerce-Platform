@@ -8,13 +8,11 @@ import java.util.UUID;
 
 /**
  * Repository interface for mapping {@link User} entities.
- *
  * <p>
- * Extends {@link JpaRepository} to provide standard CRUD operations
- * and adds a query method for looking up users by their email address.
- * </p>
+ * Extends {@link JpaRepository} to provide standard CRUD operations.
  */
 public interface UserRepository extends JpaRepository<User, UUID> {
+
     /**
      * Retrieves a user by their email address.
      *

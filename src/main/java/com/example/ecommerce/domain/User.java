@@ -48,5 +48,4 @@ public class User {
      * The timestamp when the user account was created.
      */
     private Instant createdAt;
-
 }

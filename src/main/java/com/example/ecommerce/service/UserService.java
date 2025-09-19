@@ -1,7 +1,7 @@
 package com.example.ecommerce.service;
 
 import com.example.ecommerce.domain.User;
-import com.example.ecommerce.dto.RegisterRequest;
+import com.example.ecommerce.dto.RegisterRequestDTO;
 import com.example.ecommerce.factory.UserFactory;
 import com.example.ecommerce.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -11,8 +11,7 @@ import org.springframework.stereotype.Service;
 import java.util.Optional;
 
 /**
- * Service responsible for managing user data, including registration
- * and retrieval by email.
+ * Service responsible for managing user data.
  */
 @Service
 @RequiredArgsConstructor
@@ -29,7 +28,7 @@ public class UserService {
      *
      * @return the saved {@link User} entity
      */
-    public User registerUser(RegisterRequest request) {
+    public User registerUser(RegisterRequestDTO request) {
         User user = UserFactory.createNewUser(request.getEmail(), passwordEncoder.encode(request.getPassword()));
         return userRepository.save(user);
     }
@@ -44,5 +43,4 @@ public class UserService {
     public Optional<User> findByEmail(String email) {
         return userRepository.findByEmail(email);
     }
-
 }

@@ -4,14 +4,9 @@ import lombok.Data;
 
 /**
  * Request payload for authenticating a user.
- *
- * <p>
- * Contains the email and password credentials required to perform login
- * and issue an authentication token if valid.
- * </p>
  */
 @Data
-public class LoginRequest {
+public class LoginRequestDTO {
     private String email;
     private String password;
 }
