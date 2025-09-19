@@ -13,10 +13,8 @@ import java.util.UUID;
 
 /**
  * Entity representing the inventory of a product.
- *
  * <p>
  * Tracks the number of units available for a specific product.
- * </p>
  */
 @Entity
 @Table(name = "inventory")
@@ -38,5 +36,4 @@ public class Inventory {
      */
     @Column(nullable = false)
     private int available;
-
 }

@@ -21,7 +21,7 @@ public class InventoryService {
 
     public Inventory findById(UUID productId) {
         return inventoryRepository.findById(productId)
-                .orElseThrow(() -> new RuntimeException("Product not found in Inventory!"));
+                .orElseThrow(() -> new RuntimeException("No inventory for product " + productId));
     }
 
     @Transactional
@@ -46,10 +46,8 @@ public class InventoryService {
      */
     @Transactional
     public void reserveStock(UUID productId, int quantity) {
-         Inventory inv = inventoryRepository.findById(productId)
-                .orElseThrow(() -> new RuntimeException("No inventory for product " + productId));
-
-         if (inv.getAvailable() < quantity) {
+        Inventory inv = findById(productId);
+        if (inv.getAvailable() < quantity) {
              throw new RuntimeException("Insufficient stock");
          }
 
@@ -67,10 +65,8 @@ public class InventoryService {
      */
     @Transactional
     public void releaseStock(UUID productId, int quantity) {
-        Inventory inv = inventoryRepository.findById(productId)
-                .orElseThrow(() -> new RuntimeException("No inventory for product " + productId));
+        Inventory inv = findById(productId);
         inv.setAvailable(inv.getAvailable() + quantity);
         inventoryRepository.save(inv);
     }
-
 }
