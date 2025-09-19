@@ -1,6 +1,6 @@
 package com.example.ecommerce.service;
 
-import com.example.ecommerce.decorator.ProductServiceInterface;
+import com.example.ecommerce.proxy.ProductServiceInterface;
 import com.example.ecommerce.domain.Product;
 import com.example.ecommerce.dto.CreateProductRequest;
 import com.example.ecommerce.factory.ProductFactory;
