@@ -1,7 +1,7 @@
 package com.example.ecommerce.proxy;
 
 import com.example.ecommerce.domain.Product;
-import com.example.ecommerce.dto.CreateProductRequest;
+import com.example.ecommerce.dto.CreateProductRequestDTO;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -89,7 +89,7 @@ public class ProductServiceCachingProxy implements ProductServiceInterface {
     }
 
     @Override
-    public Product create(CreateProductRequest request) {
+    public Product create(CreateProductRequestDTO request) {
         Product product = delegate.create(request);
         
         // PROXY BEHAVIOR: Invalidate cache after modification

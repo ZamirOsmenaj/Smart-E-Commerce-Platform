@@ -2,7 +2,7 @@ package com.example.ecommerce.controller;
 
 import com.example.ecommerce.proxy.ProductServiceInterface;
 import com.example.ecommerce.domain.Product;
-import com.example.ecommerce.dto.CreateProductRequest;
+import com.example.ecommerce.dto.CreateProductRequestDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -56,7 +56,7 @@ public class ProductController {
      * @return the created {@link Product}
      */
     @PostMapping
-    public Product create(@RequestBody CreateProductRequest request) {
+    public Product create(@RequestBody CreateProductRequestDTO request) {
         return productService.create(request);
     }
 
@@ -82,5 +82,4 @@ public class ProductController {
     public void delete(@PathVariable UUID id) {
         productService.delete(id);
     }
-
 }

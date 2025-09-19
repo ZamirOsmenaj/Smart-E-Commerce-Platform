@@ -10,6 +10,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.UUID;
@@ -27,6 +28,7 @@ public class Product implements Serializable {
     /**
      * serialVersionUID
      */
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /**
@@ -55,5 +57,4 @@ public class Product implements Serializable {
      */
     @Column(nullable = false)
     private BigDecimal price;
-
 }

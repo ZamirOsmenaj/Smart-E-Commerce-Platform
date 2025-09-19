@@ -2,7 +2,7 @@ package com.example.ecommerce.service;
 
 import com.example.ecommerce.proxy.ProductServiceInterface;
 import com.example.ecommerce.domain.Product;
-import com.example.ecommerce.dto.CreateProductRequest;
+import com.example.ecommerce.dto.CreateProductRequestDTO;
 import com.example.ecommerce.factory.ProductFactory;
 import com.example.ecommerce.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
@@ -16,10 +16,8 @@ import java.util.UUID;
 /**
  * Service responsible for managing product data, including retrieval,
  * creation, update, and deletion.
- *
  * <p>
  * Utilizes caching to optimize performance for frequently accessed products.
- * </p>
  */
 @Service
 @RequiredArgsConstructor
@@ -65,13 +63,13 @@ public class ProductService implements ProductServiceInterface {
      * Evicts all entries in the "products" cache to ensure consistency.
      * </p>
      *
-     * @param request the {@link CreateProductRequest} to create
+     * @param request the {@link CreateProductRequestDTO} to create
      *
      * @return the saved {@link Product} entity
      */
     @CacheEvict(value = "products", allEntries = true)
     @Override
-    public Product create(CreateProductRequest request) {
+    public Product create(CreateProductRequestDTO request) {
         Product product = ProductFactory.createNewProduct(request.getName(), request.getDescription(), request.getPrice());
         Product savedProduct = productRepository.save(product);
         inventoryService.createInventory(savedProduct.getId(), request.getStock());
@@ -117,5 +115,4 @@ public class ProductService implements ProductServiceInterface {
         productRepository.deleteById(id);
         inventoryService.deleteInventoryById(id);
     }
-
 }

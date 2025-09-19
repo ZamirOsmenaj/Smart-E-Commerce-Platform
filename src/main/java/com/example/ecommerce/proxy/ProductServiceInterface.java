@@ -1,15 +1,15 @@
 package com.example.ecommerce.proxy;
 
 import com.example.ecommerce.domain.Product;
-import com.example.ecommerce.dto.CreateProductRequest;
+import com.example.ecommerce.dto.CreateProductRequestDTO;
 
 import java.util.List;
 import java.util.UUID;
 
 /**
  * Interface defining the contract for product service operations.
- * Used by the Decorator pattern to ensure both the original service
- * and its decorators implement the same methods.
+ * Used by the Proxy pattern to ensure both the original service
+ * and its proxies implement the same methods.
  */
 public interface ProductServiceInterface {
     
@@ -26,7 +26,7 @@ public interface ProductServiceInterface {
     /**
      * Creates a new product.
      */
-    Product create(CreateProductRequest request);
+    Product create(CreateProductRequestDTO request);
     
     /**
      * Updates an existing product.
