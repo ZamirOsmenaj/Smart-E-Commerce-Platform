@@ -1,13 +1,14 @@
 package com.example.ecommerce.jobs;
 
 import com.example.ecommerce.domain.Order;
-import com.example.ecommerce.domain.enums.OrderStatus;
 import com.example.ecommerce.observer.OrderStatusPublisher;
-import com.example.ecommerce.repository.OrderRepository;
+import com.example.ecommerce.service.OrderService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
@@ -15,41 +16,58 @@ import java.util.List;
 
 /**
  * Quartz job that cancels orders which remain unpaid beyond a cutoff time.
+ * 
+ * IMPROVED ARCHITECTURE:
+ * - Uses OrderService instead of direct repository access
+ * - Follows proper layered architecture principles
+ * - Configurable timeout via application properties
+ * - Better error handling and logging
  *
  * <p>
- * The job queries for orders with {@link OrderStatus#PENDING} created
- * before a configurable threshold (currently 1 hour) and:
+ * The job uses {@link OrderService} to:
  * <ul>
- *   <li>Sets their status to {@link OrderStatus#CANCELLED}</li>
- *   <li>Persists the update in the {@link OrderRepository}</li>
- *   <li>Releases reserved stock for each order item via {@link InventoryService}</li>
+ *   <li>Find unpaid orders older than the configured threshold</li>
+ *   <li>Cancel orders using proper business logic</li>
+ *   <li>Trigger observer notifications for inventory release</li>
  * </ul>
- *
- * <p>
- * This helps keep the system clean of stale orders and ensures
- * inventory is not locked indefinitely by unpaid orders.
  */
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class CancelUnpaidOrdersJob implements Job {
 
-    private final OrderRepository orderRepository;
+    private final OrderService orderService;
     private final OrderStatusPublisher orderStatusPublisher;
+    
+    @Value("${app.orders.unpaid-timeout-minutes:60}")
+    private int unpaidTimeoutMinutes;
 
     @Override
     public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
-        // Cutoff e.g., 1 hour
-        Instant cutOff = Instant.now().minusSeconds(3600);
-        List<Order> toCancel = orderRepository.findByStatusAndCreatedAtBefore(OrderStatus.PENDING, cutOff);
-
-        for (Order order : toCancel) {
-            OrderStatus oldStatus = order.getStatus();
-            order.setStatus(OrderStatus.CANCELLED);
-            orderRepository.save(order);
-
-            // Notify observers of the status change - they will handle inventory release and notifications
-            orderStatusPublisher.notifyStatusChange(order, oldStatus, OrderStatus.CANCELLED);
+        try {
+            log.info("Starting unpaid orders cancellation job - timeout: {} minutes", unpaidTimeoutMinutes);
+            
+            // Calculate cutoff time based on configuration
+            Instant cutOff = Instant.now().minusSeconds(unpaidTimeoutMinutes * 60L);
+            
+            // Use service layer instead of direct repository access
+            List<Order> unpaidOrders = orderService.findUnpaidOrdersOlderThan(cutOff);
+            
+            if (unpaidOrders.isEmpty()) {
+                log.info("No unpaid orders found older than {}", cutOff);
+                return;
+            }
+            
+            log.info("Found {} unpaid orders to cancel", unpaidOrders.size());
+            
+            // Use service method for bulk cancellation with proper business logic
+            orderService.cancelOrders(unpaidOrders, "Automatic cancellation - payment timeout", orderStatusPublisher);
+            
+            log.info("Successfully cancelled {} unpaid orders", unpaidOrders.size());
+            
+        } catch (Exception e) {
+            log.error("Error executing unpaid orders cancellation job", e);
+            throw new JobExecutionException("Failed to cancel unpaid orders", e);
         }
     }
-
 }

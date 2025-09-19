@@ -1,5 +1,7 @@
 package com.example.ecommerce.service;
 
+import com.example.ecommerce.domain.enums.OrderStatus;
+import com.example.ecommerce.observer.OrderStatusPublisher;
 import com.example.ecommerce.proxy.ProductServiceInterface;
 import com.example.ecommerce.domain.Order;
 import com.example.ecommerce.domain.OrderItem;
@@ -14,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -117,6 +120,64 @@ public class OrderService {
         return orderRepository.findById(orderId)
                 .map(this::mapToResponse)
                 .orElseThrow(() -> new RuntimeException("Order not found!"));
+    }
+
+    /**
+     * Finds orders by status and created before a specific time.
+     * This method encapsulates repository access and provides a clean service layer interface.
+     *
+     * @param status the order status to filter by
+     * @param cutoffTime orders created before this time
+     *
+     * @return list of orders matching the criteria
+     */
+    public List<Order> findOrdersByStatusAndCreatedBefore(OrderStatus status,
+                                                          Instant cutoffTime) {
+        log.debug("Finding orders with status {} created before {}", status, cutoffTime);
+        return orderRepository.findByStatusAndCreatedAtBefore(status, cutoffTime);
+    }
+
+    /**
+     * Bulk cancellation of orders with status change notification.
+     * This method handles the complete cancellation workflow including observer notifications.
+     *
+     * @param orders list of orders to cancel
+     * @param reason the reason for cancellation
+     *
+     * @param statusPublisher the publisher to notify observers of status changes
+     */
+    @Transactional
+    public void cancelOrders(List<Order> orders, String reason, 
+                           OrderStatusPublisher statusPublisher) {
+        log.info("Bulk cancelling {} orders - Reason: {}", orders.size(), reason);
+        
+        for (Order order : orders) {
+            OrderStatus oldStatus = order.getStatus();
+            order.setStatus(OrderStatus.CANCELLED);
+            
+            // Save the order
+            orderRepository.save(order);
+            
+            // Notify observers (this will handle inventory release, notifications, etc.)
+            statusPublisher.notifyStatusChange(order, oldStatus, OrderStatus.CANCELLED);
+            
+            log.debug("Cancelled order: {}", order.getId());
+        }
+        
+        log.info("Successfully cancelled {} orders", orders.size());
+    }
+
+    /**
+     * Finds unpaid orders that are older than the specified time.
+     * Business logic method that encapsulates the criteria for "unpaid orders".
+     *
+     * @param cutoffTime orders created before this time are considered stale
+     *
+     * @return list of unpaid orders that should be cancelled
+     */
+    public List<Order> findUnpaidOrdersOlderThan(Instant cutoffTime) {
+        log.debug("Finding unpaid orders older than {}", cutoffTime);
+        return findOrdersByStatusAndCreatedBefore(OrderStatus.PENDING, cutoffTime);
     }
 
     /**
