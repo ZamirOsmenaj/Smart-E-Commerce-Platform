@@ -22,11 +22,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
- * Service responsible for handling customer orders, including creation
- * and retrieval of orders for a specific user.
- * <p>
- * Handles stock reservation via {@link InventoryService} and product lookups
- * via {@link ProductService}.
+ * Service responsible for handling customer orders.
  */
 @Service
 @RequiredArgsConstructor
@@ -36,19 +32,11 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final InventoryService inventoryService;
     private final ProductServiceInterface productService;
+    private final OrderValidationService orderValidationService;
 
     /**
      * Creates a new order for a given user based on the provided request.
-     * <p>
-     * Steps:
-     * <ul>
-     *     <li>Validates product availability using {@link ProductService}.</li>
-     *     <li>Reserves stock for each item via {@link InventoryService}.</li>
-     *     <li>Calculates the total cost of the order.</li>
-     *     <li>Saves the order and its items in the database.</li>
-     * </ul>
-     * </p>
-     *
+
      * @param userId  the ID of the user placing the order
      * @param request the request containing order items and quantities
      *
@@ -60,6 +48,17 @@ public class OrderService {
     public OrderResponseDTO createOrder(UUID userId, CreateOrderRequestDTO request) {
         log.info("Creating order for user: {} with {} items", userId, request.getItems().size());
         
+        // CHAIN OF RESPONSIBILITY: Validate the order request
+        var validationResult = orderValidationService.validateOrderRequest(request);
+        if (!validationResult.isValid()) {
+            String errorMessage = String.format("Order validation failed: %s", 
+                    String.join(", ", validationResult.getErrors()));
+            log.error("ORDER VALIDATION FAILED: {}", errorMessage);
+            throw new RuntimeException(errorMessage);
+        }
+        
+        log.info("Order validation passed - proceeding with order creation");
+        
         BigDecimal total = BigDecimal.ZERO;
 
         // Create the order first without items
@@ -67,15 +66,12 @@ public class OrderService {
         log.debug("Created order object for user: {}", userId);
 
         // Create items and calculate total
+        // NOTE: Validation already checked product existence and stock, so this should be safe
         Order finalOrder = order;
         List<OrderItem> items = request.getItems().stream().map(reqItem -> {
             var product = productService.findById(reqItem.getProductId());
-            var inventory = inventoryService.findById(reqItem.getProductId());
-
-            if (inventory.getAvailable() < reqItem.getQuantity()) {
-                throw new RuntimeException("Not enough stock for "+ product.getName());
-            }
-
+            
+            // Reserve stock (validation already confirmed availability)
             inventoryService.reserveStock(product.getId(), reqItem.getQuantity());
             log.debug("Reserved {} units of product: {}", reqItem.getQuantity(), product.getId());
 
@@ -143,7 +139,6 @@ public class OrderService {
      *
      * @param orders list of orders to cancel
      * @param reason the reason for cancellation
-     *
      * @param statusPublisher the publisher to notify observers of status changes
      */
     @Transactional
@@ -164,7 +159,7 @@ public class OrderService {
             log.debug("Cancelled order: {}", order.getId());
         }
         
-        log.info("Successfully cancelled {} orders", orders.size());
+        log.info("Bulk cancellation completed for {} orders", orders.size());
     }
 
     /**
