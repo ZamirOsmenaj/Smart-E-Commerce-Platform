@@ -6,6 +6,7 @@ import com.example.ecommerce.dto.PaymentResponseDTO;
 import com.example.ecommerce.observer.OrderStatusPublisher;
 import com.example.ecommerce.payment.PaymentStrategy;
 import com.example.ecommerce.repository.OrderRepository;
+import com.example.ecommerce.state.OrderStateManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,11 +29,14 @@ public class PaymentService {
     private final Map<String, PaymentStrategy> strategies;
     private final OrderRepository orderRepository;
     private final OrderStatusPublisher orderStatusPublisher;
+    private final OrderStateManager orderStateManager;
 
     /**
      * Attempts to process payment for the given orderId.
      * If approved -> sets order status to PAID.
      * If declined -> sets order status to CANCELLED and releases reserved stock.
+     *
+     * STATE PATTERN: Validates payment operation before processing.
      *
      * @param orderId
      * @param provider
@@ -44,10 +48,10 @@ public class PaymentService {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("Order not found!"));
 
+        // STATE PATTERN: Validate payment operation
+        orderStateManager.validateOperation(order, "payment");
+
         OrderStatus oldStatus = order.getStatus();
-        if (oldStatus != OrderStatus.PENDING) {
-            throw new RuntimeException("Order is not in PENDING state!");
-        }
 
         PaymentStrategy strategy = strategies.get(provider);
         if (strategy == null) {
@@ -56,6 +60,9 @@ public class PaymentService {
 
         PaymentResponseDTO response = strategy.processPayment(order);
         OrderStatus newStatus = response.getOrderStatus();
+
+        // STATE PATTERN: Validate state transition
+        orderStateManager.validateTransition(order, newStatus);
 
         // Update order status
         order.setStatus(newStatus);
