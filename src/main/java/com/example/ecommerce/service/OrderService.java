@@ -10,6 +10,7 @@ import com.example.ecommerce.dto.OrderResponseDTO;
 import com.example.ecommerce.factory.OrderFactory;
 import com.example.ecommerce.factory.OrderItemFactory;
 import com.example.ecommerce.repository.OrderRepository;
+import com.example.ecommerce.state.OrderStateManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -33,6 +34,8 @@ public class OrderService {
     private final InventoryService inventoryService;
     private final ProductServiceInterface productService;
     private final OrderValidationService orderValidationService;
+    private final OrderStateManager orderStateManager;
+    private final OrderStatusPublisher orderStatusPublisher;
 
     /**
      * Creates a new order for a given user based on the provided request.
@@ -112,6 +115,9 @@ public class OrderService {
                 .toList();
     }
 
+    /**
+     * Retrieves specific order based on the order ID for that user
+     */
     public OrderResponseDTO getById(UUID orderId) {
         return orderRepository.findById(orderId)
                 .map(this::mapToResponse)
@@ -173,6 +179,117 @@ public class OrderService {
     public List<Order> findUnpaidOrdersOlderThan(Instant cutoffTime) {
         log.debug("Finding unpaid orders older than {}", cutoffTime);
         return findOrdersByStatusAndCreatedBefore(OrderStatus.PENDING, cutoffTime);
+    }
+
+    /**
+     * Cancels an order with state validation.
+     * 
+     * STATE PATTERN: Validates cancellation operation before processing.
+     * 
+     * @param orderId the ID of the order to cancel
+     * @param reason the reason for cancellation
+     * @return the updated order response
+     */
+    @Transactional
+    public OrderResponseDTO cancelOrder(UUID orderId, String reason) {
+        log.info("ORDER SERVICE: Starting cancellation for order {} - Reason: {}", orderId, reason);
+        
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not found!"));
+        
+        log.info("ORDER SERVICE: Found order {} with current status: {}", orderId, order.getStatus());
+        
+        // STATE PATTERN: Validate cancellation operation
+        orderStateManager.validateOperation(order, "cancel");
+        
+        OrderStatus oldStatus = order.getStatus();
+        
+        // For paid orders, we would need to process refund here
+        // For now, we'll just change the status
+        order.setStatus(OrderStatus.CANCELLED);
+        
+        // STATE PATTERN: Validate state transition
+        orderStateManager.validateTransition(order, OrderStatus.CANCELLED);
+        
+        // Save the updated order
+        order = orderRepository.save(order);
+        
+        // OBSERVER PATTERN: Notify observers of status change
+        orderStatusPublisher.notifyStatusChange(order, oldStatus, OrderStatus.CANCELLED);
+        
+        log.info("Successfully cancelled order: {}", orderId);
+        
+        return mapToResponse(order);
+    }
+    
+    /**
+     * Processes a refund for an order with state validation.
+     * 
+     * STATE PATTERN: Validates refund operation before processing.
+     * 
+     * @param orderId the ID of the order to refund
+     * @param reason the reason for refund
+     * @return the updated order response
+     */
+    @Transactional
+    public OrderResponseDTO refundOrder(UUID orderId, String reason) {
+        log.info("Processing refund for order {} - Reason: {}", orderId, reason);
+        
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not found!"));
+        
+        // STATE PATTERN: Validate refund operation
+        orderStateManager.validateOperation(order, "refund");
+        
+        OrderStatus oldStatus = order.getStatus();
+        
+        // In a real implementation, this would:
+        // 1. Process refund through payment gateway
+        // 2. Update inventory (return items to stock)
+        // 3. Send refund confirmation to customer
+        
+        // For now, we'll transition to CANCELLED (refunded orders are considered cancelled)
+        order.setStatus(OrderStatus.CANCELLED);
+        
+        // STATE PATTERN: Validate state transition
+        orderStateManager.validateTransition(order, OrderStatus.CANCELLED);
+        
+        // Save the updated order
+        order = orderRepository.save(order);
+        
+        // OBSERVER PATTERN: Notify observers of status change
+        orderStatusPublisher.notifyStatusChange(order, oldStatus, OrderStatus.CANCELLED);
+        
+        log.info("Successfully processed refund for order: {}", orderId);
+        
+        return mapToResponse(order);
+    }
+    
+    /**
+     * Gets available actions for an order in its current state.
+     * 
+     * @param orderId the ID of the order
+     * @return description of available actions
+     */
+    public String getOrderAvailableActions(UUID orderId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not found!"));
+        
+        return orderStateManager.getAvailableActions(order);
+    }
+    
+    /**
+     * Checks if an order can transition to a specific status.
+     * 
+     * @param orderId the ID of the order
+     * @param targetStatus the target status
+     * @return true if transition is allowed
+     */
+    public boolean canOrderTransitionTo(UUID orderId, OrderStatus targetStatus) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not found!"));
+        
+        return orderStateManager.canTransitionTo(order, targetStatus);
     }
 
     /**
