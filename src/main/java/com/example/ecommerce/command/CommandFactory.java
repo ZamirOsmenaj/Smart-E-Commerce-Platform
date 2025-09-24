@@ -1,22 +1,19 @@
 package com.example.ecommerce.command;
 
 //import com.example.ecommerce.command.order.BatchCancelOrdersCommand;
+
 import com.example.ecommerce.command.order.CancelOrderCommand;
 import com.example.ecommerce.command.order.CreateOrderCommand;
-import com.example.ecommerce.command.order.RefundOrderCommand;
-import com.example.ecommerce.domain.Order;
 import com.example.ecommerce.dto.CreateOrderRequestDTO;
 import com.example.ecommerce.observer.OrderStatusPublisher;
 import com.example.ecommerce.proxy.ProductServiceInterface;
 import com.example.ecommerce.repository.OrderRepository;
 import com.example.ecommerce.service.InventoryService;
-import com.example.ecommerce.service.OrderService;
 import com.example.ecommerce.service.OrderValidationService;
 import com.example.ecommerce.state.OrderStateManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
 import java.util.UUID;
 
 /**
@@ -77,23 +74,23 @@ public class CommandFactory {
         );
     }
     
-    /**
-     * Creates a command for processing an order refund.
-     * Command contains complete business logic - no OrderService dependency.
-     * 
-     * @param orderId the order ID to refund
-     * @param reason the refund reason
-     * @return RefundOrderCommand instance
-     */
-    public RefundOrderCommand refundOrderCommand(UUID orderId, String reason) {
-        return new RefundOrderCommand(
-            orderRepository,
-            orderStatusPublisher,
-            orderStateManager,
-            orderId,
-            reason
-        );
-    }
+//    /**
+//     * Creates a command for processing an order refund.
+//     * Command contains complete business logic - no OrderService dependency.
+//     *
+//     * @param orderId the order ID to refund
+//     * @param reason the refund reason
+//     * @return RefundOrderCommand instance
+//     */
+//    public RefundOrderCommand refundOrderCommand(UUID orderId, String reason) {
+//        return new RefundOrderCommand(
+//            orderRepository,
+//            orderStatusPublisher,
+//            orderStateManager,
+//            orderId,
+//            reason
+//        );
+//    }
     
 //    /**
 //     * Creates a command for batch cancellation of orders.
