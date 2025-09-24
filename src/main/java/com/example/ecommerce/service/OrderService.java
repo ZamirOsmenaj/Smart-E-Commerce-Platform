@@ -1,14 +1,13 @@
 package com.example.ecommerce.service;
 
-import com.example.ecommerce.domain.enums.OrderStatus;
-import com.example.ecommerce.observer.OrderStatusPublisher;
-import com.example.ecommerce.proxy.ProductServiceInterface;
+import com.example.ecommerce.command.CommandFactory;
+import com.example.ecommerce.command.CommandInvoker;
+import com.example.ecommerce.command.CommandResult;
 import com.example.ecommerce.domain.Order;
-import com.example.ecommerce.domain.OrderItem;
+import com.example.ecommerce.domain.enums.OrderStatus;
 import com.example.ecommerce.dto.CreateOrderRequestDTO;
 import com.example.ecommerce.dto.OrderResponseDTO;
-import com.example.ecommerce.factory.OrderFactory;
-import com.example.ecommerce.factory.OrderItemFactory;
+import com.example.ecommerce.observer.OrderStatusPublisher;
 import com.example.ecommerce.repository.OrderRepository;
 import com.example.ecommerce.state.OrderStateManager;
 import lombok.RequiredArgsConstructor;
@@ -16,14 +15,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 /**
  * Service responsible for handling customer orders.
+ * Integrates Command Pattern for advanced operations with undo capabilities.
  */
 @Service
 @RequiredArgsConstructor
@@ -31,74 +29,34 @@ import java.util.stream.Collectors;
 public class OrderService {
 
     private final OrderRepository orderRepository;
-    private final InventoryService inventoryService;
-    private final ProductServiceInterface productService;
-    private final OrderValidationService orderValidationService;
     private final OrderStateManager orderStateManager;
     private final OrderStatusPublisher orderStatusPublisher;
+    
+    // Command Pattern components - direct injection now that there's no cyclic dependency
+    private final CommandFactory commandFactory;
+    private final CommandInvoker commandInvoker;
 
     /**
      * Creates a new order for a given user based on the provided request.
-
+     * 
+     * @deprecated Use createOrderWithCommand() for Command Pattern benefits
      * @param userId  the ID of the user placing the order
      * @param request the request containing order items and quantities
-     *
      * @return an {@link OrderResponseDTO} representing the created order
-     *
      * @throws RuntimeException if product stock is insufficient
      */
+    @Deprecated
     @Transactional
     public OrderResponseDTO createOrder(UUID userId, CreateOrderRequestDTO request) {
-        log.info("Creating order for user: {} with {} items", userId, request.getItems().size());
+        log.warn("Using deprecated createOrder method - consider using createOrderWithCommand() instead");
         
-        // CHAIN OF RESPONSIBILITY: Validate the order request
-        var validationResult = orderValidationService.validateOrderRequest(request);
-        if (!validationResult.isValid()) {
-            String errorMessage = String.format("Order validation failed: %s", 
-                    String.join(", ", validationResult.getErrors()));
-            log.error("ORDER VALIDATION FAILED: {}", errorMessage);
-            throw new RuntimeException(errorMessage);
+        // Delegate to command-based method
+        CommandResult result = createOrderWithCommand(userId, request);
+        if (result.isSuccess()) {
+            return (OrderResponseDTO) result.getData();
+        } else {
+            throw new RuntimeException(result.getMessage());
         }
-        
-        log.info("Order validation passed - proceeding with order creation");
-        
-        BigDecimal total = BigDecimal.ZERO;
-
-        // Create the order first without items
-        Order order = OrderFactory.createNewOrder(userId, BigDecimal.ZERO, null);
-        log.debug("Created order object for user: {}", userId);
-
-        // Create items and calculate total
-        // NOTE: Validation already checked product existence and stock, so this should be safe
-        Order finalOrder = order;
-        List<OrderItem> items = request.getItems().stream().map(reqItem -> {
-            var product = productService.findById(reqItem.getProductId());
-            
-            // Reserve stock (validation already confirmed availability)
-            inventoryService.reserveStock(product.getId(), reqItem.getQuantity());
-            log.debug("Reserved {} units of product: {}", reqItem.getQuantity(), product.getId());
-
-            return OrderItemFactory.createNewOrderItem(finalOrder, product.getId(), reqItem.getQuantity(), product.getPrice());
-        }).collect(Collectors.toList());
-
-        // Calculate total from items
-        total = items.stream()
-                .map(item -> item.getPrice().multiply(BigDecimal.valueOf(item.getQuantity())))
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-
-        // Set the calculated total and items
-        order.setTotal(total);
-        order.setItems(items);
-        
-        log.debug("Order prepared with total: {} and {} items", total, items.size());
-        
-        // Save the order with all items (cascade will handle the items)
-        order = orderRepository.save(order);
-        
-        log.info("Successfully created order: {} for user: {} with total: {}", 
-                order.getId(), userId, total);
-
-        return mapToResponse(order);
     }
 
     /**
@@ -184,86 +142,46 @@ public class OrderService {
     /**
      * Cancels an order with state validation.
      * 
-     * STATE PATTERN: Validates cancellation operation before processing.
-     * 
+     * @deprecated Use cancelOrderWithCommand() for Command Pattern benefits
      * @param orderId the ID of the order to cancel
      * @param reason the reason for cancellation
      * @return the updated order response
      */
+    @Deprecated
     @Transactional
     public OrderResponseDTO cancelOrder(UUID orderId, String reason) {
-        log.info("ORDER SERVICE: Starting cancellation for order {} - Reason: {}", orderId, reason);
+        log.warn("Using deprecated cancelOrder method - consider using cancelOrderWithCommand() instead");
         
-        Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new RuntimeException("Order not found!"));
-        
-        log.info("ORDER SERVICE: Found order {} with current status: {}", orderId, order.getStatus());
-        
-        // STATE PATTERN: Validate cancellation operation
-        orderStateManager.validateOperation(order, "cancel");
-        
-        OrderStatus oldStatus = order.getStatus();
-        
-        // For paid orders, we would need to process refund here
-        // For now, we'll just change the status
-        order.setStatus(OrderStatus.CANCELLED);
-        
-        // STATE PATTERN: Validate state transition
-        orderStateManager.validateTransition(order, OrderStatus.CANCELLED);
-        
-        // Save the updated order
-        order = orderRepository.save(order);
-        
-        // OBSERVER PATTERN: Notify observers of status change
-        orderStatusPublisher.notifyStatusChange(order, oldStatus, OrderStatus.CANCELLED);
-        
-        log.info("Successfully cancelled order: {}", orderId);
-        
-        return mapToResponse(order);
+        // Delegate to command-based method
+        CommandResult result = cancelOrderWithCommand(orderId, reason);
+        if (result.isSuccess()) {
+            return (OrderResponseDTO) result.getData();
+        } else {
+            throw new RuntimeException(result.getMessage());
+        }
     }
     
-    /**
-     * Processes a refund for an order with state validation.
-     * 
-     * STATE PATTERN: Validates refund operation before processing.
-     * 
-     * @param orderId the ID of the order to refund
-     * @param reason the reason for refund
-     * @return the updated order response
-     */
-    @Transactional
-    public OrderResponseDTO refundOrder(UUID orderId, String reason) {
-        log.info("Processing refund for order {} - Reason: {}", orderId, reason);
-        
-        Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new RuntimeException("Order not found!"));
-        
-        // STATE PATTERN: Validate refund operation
-        orderStateManager.validateOperation(order, "refund");
-        
-        OrderStatus oldStatus = order.getStatus();
-        
-        // In a real implementation, this would:
-        // 1. Process refund through payment gateway
-        // 2. Update inventory (return items to stock)
-        // 3. Send refund confirmation to customer
-        
-        // For now, we'll transition to CANCELLED (refunded orders are considered cancelled)
-        order.setStatus(OrderStatus.CANCELLED);
-        
-        // STATE PATTERN: Validate state transition
-        orderStateManager.validateTransition(order, OrderStatus.CANCELLED);
-        
-        // Save the updated order
-        order = orderRepository.save(order);
-        
-        // OBSERVER PATTERN: Notify observers of status change
-        orderStatusPublisher.notifyStatusChange(order, oldStatus, OrderStatus.CANCELLED);
-        
-        log.info("Successfully processed refund for order: {}", orderId);
-        
-        return mapToResponse(order);
-    }
+//    /**
+//     * Processes a refund for an order with state validation.
+//     *
+//     * @deprecated Use refundOrderWithCommand() for Command Pattern benefits
+//     * @param orderId the ID of the order to refund
+//     * @param reason the reason for refund
+//     * @return the updated order response
+//     */
+//    @Deprecated
+//    @Transactional
+//    public OrderResponseDTO refundOrder(UUID orderId, String reason) {
+//        log.warn("Using deprecated refundOrder method - consider using refundOrderWithCommand() instead");
+//
+//        // Delegate to command-based method
+//        CommandResult result = refundOrderWithCommand(orderId, reason);
+//        if (result.isSuccess()) {
+//            return (OrderResponseDTO) result.getData();
+//        } else {
+//            throw new RuntimeException(result.getMessage());
+//        }
+//    }
     
     /**
      * Gets available actions for an order in its current state.
@@ -290,6 +208,119 @@ public class OrderService {
                 .orElseThrow(() -> new RuntimeException("Order not found!"));
         
         return orderStateManager.canTransitionTo(order, targetStatus);
+    }
+
+    // ========================================
+    // COMMAND PATTERN INTEGRATION METHODS
+    // ========================================
+    
+    /**
+     * Creates an order using Command Pattern with undo capability.
+     * 
+     * COMMAND PATTERN: Encapsulates order creation as a command.
+     * 
+     * @param userId the user ID
+     * @param request the order creation request
+     * @return CommandResult with order data or error information
+     */
+    public CommandResult createOrderWithCommand(UUID userId, CreateOrderRequestDTO request) {
+        var createCommand = commandFactory.createOrderCommand(userId, request);
+        return commandInvoker.execute(createCommand);
+    }
+    
+    /**
+     * Cancels an order using Command Pattern.
+     * 
+     * COMMAND PATTERN: Encapsulates order cancellation as a command.
+     * 
+     * @param orderId the order ID to cancel
+     * @param reason the cancellation reason
+     * @return CommandResult with order data or error information
+     */
+    public CommandResult cancelOrderWithCommand(UUID orderId, String reason) {
+        var cancelCommand = commandFactory.cancelOrderCommand(orderId, reason);
+        return commandInvoker.execute(cancelCommand);
+    }
+    
+//    /**
+//     * Processes an order refund using Command Pattern.
+//     *
+//     * COMMAND PATTERN: Encapsulates order refund as a command.
+//     *
+//     * @param orderId the order ID to refund
+//     * @param reason the refund reason
+//     * @return CommandResult with order data or error information
+//     */
+//    public CommandResult refundOrderWithCommand(UUID orderId, String reason) {
+//        var refundCommand = commandFactory.refundOrderCommand(orderId, reason);
+//        return commandInvoker.execute(refundCommand);
+//    }
+    
+//    /**
+//     * Batch cancels expired orders using Command Pattern.
+//     * This method is typically called by scheduled jobs.
+//     *
+//     * COMMAND PATTERN: Encapsulates batch operations as commands.
+//     *
+//     * @param hoursOld orders older than this many hours will be cancelled
+//     * @return CommandResult with batch operation results
+//     */
+//    public CommandResult cancelExpiredOrdersWithCommand(int hoursOld) {
+//        log.info("ORDER SERVICE: Starting command-based batch cancellation of orders older than {} hours", hoursOld);
+//
+//        // Find orders that are older than specified hours and still pending
+//        Instant cutoffTime = Instant.now().minus(hoursOld, ChronoUnit.HOURS);
+//        List<Order> expiredOrders = findUnpaidOrdersOlderThan(cutoffTime);
+//
+//        if (expiredOrders.isEmpty()) {
+//            log.info("ORDER SERVICE: No expired orders found");
+//            return CommandResult.success("No expired orders to cancel", 0);
+//        }
+//
+//        log.info("ORDER SERVICE: Found {} expired orders to cancel", expiredOrders.size());
+//
+//        // Create and execute batch cancellation command
+//        String reason = String.format("Automatic cancellation - order expired after %d hours", hoursOld);
+//        var batchCommand = commandFactory.batchCancelOrdersCommand(expiredOrders, reason, orderStatusPublisher);
+//
+//        return commandInvoker.execute(batchCommand);
+//    }
+    
+
+    
+    /**
+     * Gets command history information.
+     * 
+     * @return summary of available undo operations
+     */
+    public String getCommandHistorySummary() {
+        int undoableCommands = commandInvoker.getUndoableCommandCount();
+        String lastCommand = commandInvoker.getLastUndoableCommandDescription();
+        
+        if (undoableCommands == 0) {
+            return "No commands available for undo";
+        }
+        
+        return String.format("Commands available for undo: %d. Last command: %s", 
+                undoableCommands, lastCommand);
+    }
+    
+    /**
+     * Undoes the last command that supports undo operations.
+     * 
+     * @return CommandResult with undo operation results
+     */
+    public CommandResult undoLastCommand() {
+        return commandInvoker.undoLast();
+    }
+    
+    /**
+     * Checks if there are any commands that can be undone.
+     * 
+     * @return true if there are undoable commands
+     */
+    public boolean hasUndoableCommands() {
+        return commandInvoker.getUndoableCommandCount() > 0;
     }
 
     /**
