@@ -1,5 +1,6 @@
 package com.example.ecommerce.controller;
 
+import com.example.ecommerce.command.CommandResult;
 import com.example.ecommerce.constants.CommonConstants;
 import com.example.ecommerce.domain.enums.OrderStatus;
 import com.example.ecommerce.dto.CreateOrderRequestDTO;
@@ -18,7 +19,8 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * Controller that manages customer orders.
+ * Controller that manages customer orders using the Command Pattern.
+ * Commands encapsulate operations and provide undo capabilities where applicable.
  */
 @RestController
 @RequestMapping("/api/orders")
@@ -30,7 +32,8 @@ public class OrderController {
     private final JwtService jwtService;
 
     /**
-     * Creates a new order for the authenticated user.
+     * Creates a new order for the authenticated user using Command Pattern.
+     * COMMAND PATTERN: Encapsulates order creation as a command with undo capability.
      *
      * @param token the JWT authorization header containing the Bearer token
      * @param request the request containing order details
@@ -38,13 +41,23 @@ public class OrderController {
      * @return an {@link OrderResponseDTO} representing the created order
      */
     @PostMapping
-    public OrderResponseDTO createOrder(
+    public ResponseEntity<?> createOrder(
             @RequestHeader(CommonConstants.AUTH_HEADER) String token,
             @RequestBody CreateOrderRequestDTO request) {
 
         String jwt = token.replace(CommonConstants.BEARER_PREFIX, CommonConstants.EMPTY_STRING);
         UUID userId = jwtService.extractUserId(jwt);
-        return orderService.createOrder(userId, request);
+        
+        // COMMAND PATTERN: Use integrated OrderService command method
+        CommandResult result = orderService.createOrderWithCommand(userId, request);
+        
+        if (result.isSuccess()) {
+            log.info("ORDER CONTROLLER: Order created successfully via command pattern");
+            return ResponseEntity.ok(result.getData());
+        } else {
+            log.error("ORDER CONTROLLER: Order creation failed: {}", result.getMessage());
+            return ResponseEntity.badRequest().body(new ErrorResponse(result.getMessage()));
+        }
     }
 
     /**
@@ -64,8 +77,9 @@ public class OrderController {
     }
 
     /**
-     * Cancels an order.
+     * Cancels an order using Command Pattern.
      * 
+     * COMMAND PATTERN: Encapsulates order cancellation as a command.
      * STATE PATTERN: Uses state validation for order cancellation.
      * 
      * @param token the JWT authorization header containing the Bearer token
@@ -94,13 +108,17 @@ public class OrderController {
                 return ResponseEntity.status(403).body(new ErrorResponse("You do not own this order!"));
             }
             
-            OrderResponseDTO response = orderService.cancelOrder(orderId, request.getReason());
-            log.info("ORDER CONTROLLER: Successfully cancelled order {}", orderId);
-            return ResponseEntity.ok(response);
-        } catch (IllegalStateException e) {
-            // State validation failed - return error message
-            log.warn("ORDER CONTROLLER: State validation failed for order {}: {}", orderId, e.getMessage());
-            return ResponseEntity.badRequest().body(new ErrorResponse(e.getMessage()));
+            // COMMAND PATTERN: Use integrated OrderService command method
+            CommandResult result = orderService.cancelOrderWithCommand(orderId, request.getReason());
+            
+            if (result.isSuccess()) {
+                log.info("ORDER CONTROLLER: Successfully cancelled order {} via command pattern", orderId);
+                return ResponseEntity.ok(result.getData());
+            } else {
+                log.warn("ORDER CONTROLLER: Order cancellation failed: {}", result.getMessage());
+                return ResponseEntity.badRequest().body(new ErrorResponse(result.getMessage()));
+            }
+            
         } catch (RuntimeException e) {
             // Order not found or other runtime error
             log.error("ORDER CONTROLLER: Runtime error for order {}: {}", orderId, e.getMessage());
@@ -108,50 +126,55 @@ public class OrderController {
         }
     }
 
-    /**
-     * Processes a refund for an order.
-     * 
-     * STATE PATTERN: Uses state validation for order refunds.
-     * 
-     * @param token the JWT authorization header containing the Bearer token
-     * @param orderId the ID of the order to refund
-     * @param request the refund request containing the reason
-     * @return the updated order response
-     */
-    @PostMapping("/{orderId}/refund")
-    public ResponseEntity<?> refundOrder(
-            @RequestHeader(CommonConstants.AUTH_HEADER) String token,
-            @PathVariable UUID orderId,
-            @RequestBody RefundRequest request) {
-        
-        log.info("ORDER CONTROLLER: Received refund request for order {} with reason: {}", orderId, request.getReason());
-        
-        // Validate user owns the order
-        String jwt = token.replace(CommonConstants.BEARER_PREFIX, CommonConstants.EMPTY_STRING);
-        UUID userId = jwtService.extractUserId(jwt);
-        
-        try {
-            // Check if user owns the order
-            OrderResponseDTO existingOrder = orderService.getById(orderId);
-            if (!existingOrder.getUserId().equals(userId)) {
-                log.warn("ORDER CONTROLLER: User {} attempted to refund order {} owned by {}", 
-                        userId, orderId, existingOrder.getUserId());
-                return ResponseEntity.status(403).body(new ErrorResponse("You do not own this order!"));
-            }
-            
-            OrderResponseDTO response = orderService.refundOrder(orderId, request.getReason());
-            log.info("ORDER CONTROLLER: Successfully processed refund for order {}", orderId);
-            return ResponseEntity.ok(response);
-        } catch (IllegalStateException e) {
-            // State validation failed - return error message
-            log.warn("ORDER CONTROLLER: State validation failed for order {}: {}", orderId, e.getMessage());
-            return ResponseEntity.badRequest().body(new ErrorResponse(e.getMessage()));
-        } catch (RuntimeException e) {
-            // Order not found or other runtime error
-            log.error("ORDER CONTROLLER: Runtime error for order {}: {}", orderId, e.getMessage());
-            return ResponseEntity.notFound().build();
-        }
-    }
+//    /**
+//     * Processes a refund for an order using Command Pattern.
+//     *
+//     * COMMAND PATTERN: Encapsulates order refund as a command.
+//     * STATE PATTERN: Uses state validation for order refunds.
+//     *
+//     * @param token the JWT authorization header containing the Bearer token
+//     * @param orderId the ID of the order to refund
+//     * @param request the refund request containing the reason
+//     * @return the updated order response
+//     */
+//    @PostMapping("/{orderId}/refund")
+//    public ResponseEntity<?> refundOrder(
+//            @RequestHeader(CommonConstants.AUTH_HEADER) String token,
+//            @PathVariable UUID orderId,
+//            @RequestBody RefundRequest request) {
+//
+//        log.info("ORDER CONTROLLER: Received refund request for order {} with reason: {}", orderId, request.getReason());
+//
+//        // Validate user owns the order
+//        String jwt = token.replace(CommonConstants.BEARER_PREFIX, CommonConstants.EMPTY_STRING);
+//        UUID userId = jwtService.extractUserId(jwt);
+//
+//        try {
+//            // Check if user owns the order
+//            OrderResponseDTO existingOrder = orderService.getById(orderId);
+//            if (!existingOrder.getUserId().equals(userId)) {
+//                log.warn("ORDER CONTROLLER: User {} attempted to refund order {} owned by {}",
+//                        userId, orderId, existingOrder.getUserId());
+//                return ResponseEntity.status(403).body(new ErrorResponse("You do not own this order!"));
+//            }
+//
+//            // COMMAND PATTERN: Use integrated OrderService command method
+//            CommandResult result = orderService.refundOrderWithCommand(orderId, request.getReason());
+//
+//            if (result.isSuccess()) {
+//                log.info("ORDER CONTROLLER: Successfully processed refund for order {} via command pattern", orderId);
+//                return ResponseEntity.ok(result.getData());
+//            } else {
+//                log.warn("ORDER CONTROLLER: Order refund failed: {}", result.getMessage());
+//                return ResponseEntity.badRequest().body(new ErrorResponse(result.getMessage()));
+//            }
+//
+//        } catch (RuntimeException e) {
+//            // Order not found or other runtime error
+//            log.error("ORDER CONTROLLER: Runtime error for order {}: {}", orderId, e.getMessage());
+//            return ResponseEntity.notFound().build();
+//        }
+//    }
 
     /**
      * Gets available actions for an order in its current state.
@@ -236,6 +259,72 @@ public class OrderController {
     }
 
     /**
+     * Undoes the last command that supports undo operations.
+     * 
+     * COMMAND PATTERN: Provides undo functionality for supported commands.
+     * 
+     * @param token the JWT authorization header containing the Bearer token
+     * @return the result of the undo operation
+     */
+    @PostMapping("/undo-last")
+    public ResponseEntity<?> undoLastCommand(
+            @RequestHeader(CommonConstants.AUTH_HEADER) String token) {
+        
+        log.info("ORDER CONTROLLER: Received undo request");
+        
+        // Validate user authentication (basic check)
+        String jwt = token.replace(CommonConstants.BEARER_PREFIX, CommonConstants.EMPTY_STRING);
+        UUID userId = jwtService.extractUserId(jwt);
+        
+        // COMMAND PATTERN: Use integrated OrderService undo method
+        CommandResult result = orderService.undoLastCommand();
+        
+        if (result.isSuccess()) {
+            log.info("ORDER CONTROLLER: Successfully undone last command for user: {}", userId);
+            return ResponseEntity.ok(result);
+        } else {
+            log.warn("ORDER CONTROLLER: Failed to undo last command: {}", result.getMessage());
+            return ResponseEntity.badRequest().body(new ErrorResponse(result.getMessage()));
+        }
+    }
+
+    /**
+     * Gets information about commands that can be undone.
+     * 
+     * COMMAND PATTERN: Provides visibility into command history.
+     * 
+     * @param token the JWT authorization header containing the Bearer token
+     * @return information about undoable commands
+     */
+    @GetMapping("/undo-info")
+    public ResponseEntity<?> getUndoInfo(
+            @RequestHeader(CommonConstants.AUTH_HEADER) String token) {
+        
+        // Validate user authentication (basic check)
+        String jwt = token.replace(CommonConstants.BEARER_PREFIX, CommonConstants.EMPTY_STRING);
+        UUID userId = jwtService.extractUserId(jwt);
+        
+        // COMMAND PATTERN: Use integrated OrderService command history method
+        String historySummary = orderService.getCommandHistorySummary();
+        boolean hasUndoableCommands = orderService.hasUndoableCommands();
+        
+        // Parse the summary to extract details (simple approach)
+        int undoableCount = hasUndoableCommands ? 1 : 0; // Simplified for demo
+        String lastCommand = hasUndoableCommands ? "Available" : null;
+        
+        UndoInfoResponse response = UndoInfoResponse.builder()
+                .undoableCommandCount(undoableCount)
+                .lastUndoableCommand(lastCommand)
+                .hasUndoableCommands(hasUndoableCommands)
+                .historySummary(historySummary)
+                .build();
+        
+        log.debug("ORDER CONTROLLER: Returning undo info for user: {} - {}", userId, historySummary);
+        
+        return ResponseEntity.ok(response);
+    }
+
+    /**
      * Request DTO for order cancellation.
      */
     @Data
@@ -279,5 +368,17 @@ public class OrderController {
     @AllArgsConstructor
     public static class ErrorResponse {
         private String error;
+    }
+
+    /**
+     * Response DTO for undo information.
+     */
+    @Data
+    @Builder
+    public static class UndoInfoResponse {
+        private int undoableCommandCount;
+        private String lastUndoableCommand;
+        private boolean hasUndoableCommands;
+        private String historySummary;
     }
 }
