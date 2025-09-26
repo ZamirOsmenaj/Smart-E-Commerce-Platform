@@ -121,22 +121,4 @@ public class CommandInvoker {
         }
         return commandHistory.peek().getDescription();
     }
-    
-    /**
-     * Clears the command history.
-     * Use with caution - this will prevent undoing any previous commands.
-     */
-    public void clearHistory() {
-        log.info("INVOKER: Clearing command history ({} commands)", commandHistory.size());
-        commandHistory.clear();
-    }
-    
-    /**
-     * Returns the execution results history.
-     * 
-     * @return list of all command execution results
-     */
-    public List<CommandResult> getExecutionHistory() {
-        return new ArrayList<>(executionResults);
-    }
 }

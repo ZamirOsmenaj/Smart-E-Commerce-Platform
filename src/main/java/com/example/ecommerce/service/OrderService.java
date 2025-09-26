@@ -30,33 +30,18 @@ public class OrderService {
 
     private final OrderRepository orderRepository;
     private final OrderStateManager orderStateManager;
-    private final OrderStatusPublisher orderStatusPublisher;
-    
+
     // Command Pattern components - direct injection now that there's no cyclic dependency
     private final CommandFactory commandFactory;
     private final CommandInvoker commandInvoker;
 
     /**
-     * Creates a new order for a given user based on the provided request.
-     * 
-     * @deprecated Use createOrderWithCommand() for Command Pattern benefits
-     * @param userId  the ID of the user placing the order
-     * @param request the request containing order items and quantities
-     * @return an {@link OrderResponseDTO} representing the created order
-     * @throws RuntimeException if product stock is insufficient
+     * Retrieves specific order based on the order ID for that user
      */
-    @Deprecated
-    @Transactional
-    public OrderResponseDTO createOrder(UUID userId, CreateOrderRequestDTO request) {
-        log.warn("Using deprecated createOrder method - consider using createOrderWithCommand() instead");
-        
-        // Delegate to command-based method
-        CommandResult result = createOrderWithCommand(userId, request);
-        if (result.isSuccess()) {
-            return (OrderResponseDTO) result.getData();
-        } else {
-            throw new RuntimeException(result.getMessage());
-        }
+    public OrderResponseDTO getById(UUID orderId) {
+        return orderRepository.findById(orderId)
+                .map(this::mapToResponse)
+                .orElseThrow(() -> new RuntimeException("Order not found!"));
     }
 
     /**
@@ -71,15 +56,6 @@ public class OrderService {
                 .stream()
                 .map(this::mapToResponse)
                 .toList();
-    }
-
-    /**
-     * Retrieves specific order based on the order ID for that user
-     */
-    public OrderResponseDTO getById(UUID orderId) {
-        return orderRepository.findById(orderId)
-                .map(this::mapToResponse)
-                .orElseThrow(() -> new RuntimeException("Order not found!"));
     }
 
     /**
@@ -161,28 +137,6 @@ public class OrderService {
         }
     }
     
-//    /**
-//     * Processes a refund for an order with state validation.
-//     *
-//     * @deprecated Use refundOrderWithCommand() for Command Pattern benefits
-//     * @param orderId the ID of the order to refund
-//     * @param reason the reason for refund
-//     * @return the updated order response
-//     */
-//    @Deprecated
-//    @Transactional
-//    public OrderResponseDTO refundOrder(UUID orderId, String reason) {
-//        log.warn("Using deprecated refundOrder method - consider using refundOrderWithCommand() instead");
-//
-//        // Delegate to command-based method
-//        CommandResult result = refundOrderWithCommand(orderId, reason);
-//        if (result.isSuccess()) {
-//            return (OrderResponseDTO) result.getData();
-//        } else {
-//            throw new RuntimeException(result.getMessage());
-//        }
-//    }
-    
     /**
      * Gets available actions for an order in its current state.
      * 
@@ -217,8 +171,6 @@ public class OrderService {
     /**
      * Creates an order using Command Pattern with undo capability.
      * 
-     * COMMAND PATTERN: Encapsulates order creation as a command.
-     * 
      * @param userId the user ID
      * @param request the order creation request
      * @return CommandResult with order data or error information
@@ -231,8 +183,6 @@ public class OrderService {
     /**
      * Cancels an order using Command Pattern.
      * 
-     * COMMAND PATTERN: Encapsulates order cancellation as a command.
-     * 
      * @param orderId the order ID to cancel
      * @param reason the cancellation reason
      * @return CommandResult with order data or error information
@@ -241,52 +191,6 @@ public class OrderService {
         var cancelCommand = commandFactory.cancelOrderCommand(orderId, reason);
         return commandInvoker.execute(cancelCommand);
     }
-    
-//    /**
-//     * Processes an order refund using Command Pattern.
-//     *
-//     * COMMAND PATTERN: Encapsulates order refund as a command.
-//     *
-//     * @param orderId the order ID to refund
-//     * @param reason the refund reason
-//     * @return CommandResult with order data or error information
-//     */
-//    public CommandResult refundOrderWithCommand(UUID orderId, String reason) {
-//        var refundCommand = commandFactory.refundOrderCommand(orderId, reason);
-//        return commandInvoker.execute(refundCommand);
-//    }
-    
-//    /**
-//     * Batch cancels expired orders using Command Pattern.
-//     * This method is typically called by scheduled jobs.
-//     *
-//     * COMMAND PATTERN: Encapsulates batch operations as commands.
-//     *
-//     * @param hoursOld orders older than this many hours will be cancelled
-//     * @return CommandResult with batch operation results
-//     */
-//    public CommandResult cancelExpiredOrdersWithCommand(int hoursOld) {
-//        log.info("ORDER SERVICE: Starting command-based batch cancellation of orders older than {} hours", hoursOld);
-//
-//        // Find orders that are older than specified hours and still pending
-//        Instant cutoffTime = Instant.now().minus(hoursOld, ChronoUnit.HOURS);
-//        List<Order> expiredOrders = findUnpaidOrdersOlderThan(cutoffTime);
-//
-//        if (expiredOrders.isEmpty()) {
-//            log.info("ORDER SERVICE: No expired orders found");
-//            return CommandResult.success("No expired orders to cancel", 0);
-//        }
-//
-//        log.info("ORDER SERVICE: Found {} expired orders to cancel", expiredOrders.size());
-//
-//        // Create and execute batch cancellation command
-//        String reason = String.format("Automatic cancellation - order expired after %d hours", hoursOld);
-//        var batchCommand = commandFactory.batchCancelOrdersCommand(expiredOrders, reason, orderStatusPublisher);
-//
-//        return commandInvoker.execute(batchCommand);
-//    }
-    
-
     
     /**
      * Gets command history information.
