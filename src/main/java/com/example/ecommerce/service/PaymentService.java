@@ -1,13 +1,17 @@
 package com.example.ecommerce.service;
 
+import com.example.ecommerce.decorator.EcommerceNotificationService;
 import com.example.ecommerce.domain.Order;
+import com.example.ecommerce.domain.User;
 import com.example.ecommerce.domain.enums.OrderStatus;
 import com.example.ecommerce.dto.PaymentResponseDTO;
 import com.example.ecommerce.observer.OrderStatusPublisher;
 import com.example.ecommerce.payment.PaymentStrategy;
 import com.example.ecommerce.repository.OrderRepository;
+import com.example.ecommerce.repository.UserRepository;
 import com.example.ecommerce.state.OrderStateManager;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,6 +24,7 @@ import java.util.UUID;
  */
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class PaymentService {
 
     /**
@@ -28,8 +33,10 @@ public class PaymentService {
      */
     private final Map<String, PaymentStrategy> strategies;
     private final OrderRepository orderRepository;
+    private final UserRepository userRepository;
     private final OrderStatusPublisher orderStatusPublisher;
     private final OrderStateManager orderStateManager;
+    private final EcommerceNotificationService notificationService;
 
     /**
      * Attempts to process payment for the given orderId.
@@ -67,6 +74,16 @@ public class PaymentService {
         // Update order status
         order.setStatus(newStatus);
         orderRepository.save(order);
+
+        // Send payment failure notification if payment was declined
+        if (newStatus == OrderStatus.CANCELLED) {
+            User customer = userRepository.findById(order.getUserId()).orElse(null);
+            if (customer != null) {
+                log.info("Sending payment failure notification for order {} to user {}", 
+                    orderId, customer.getEmail());
+                notificationService.sendPaymentFailureNotification(order, customer, "Order has been cancelled :(");
+            }
+        }
 
         // Notify observers of status change
         orderStatusPublisher.notifyStatusChange(order, oldStatus, newStatus);
