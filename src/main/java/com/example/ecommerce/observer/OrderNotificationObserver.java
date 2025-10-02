@@ -1,55 +1,55 @@
 package com.example.ecommerce.observer;
 
+import com.example.ecommerce.decorator.EcommerceNotificationService;
 import com.example.ecommerce.domain.Order;
+import com.example.ecommerce.domain.User;
 import com.example.ecommerce.domain.enums.OrderStatus;
+import com.example.ecommerce.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 /**
  * Observer that handles notifications when order status changes.
- * In a real implementation, this would send emails, SMS, or push notifications.
+ * Now uses the Decorator pattern notification system for flexible multichannel notifications.
  */
 @Component
 @Slf4j
+@RequiredArgsConstructor
 public class OrderNotificationObserver implements OrderStatusObserver {
+    
+    private final EcommerceNotificationService notificationService;
+    private final UserRepository userRepository;
     
     @Override
     public void onStatusChanged(Order order, OrderStatus oldStatus, OrderStatus newStatus) {
+        User customer = userRepository.findById(order.getUserId())
+                .orElse(null);
+
+        if (customer == null) {
+            log.warn("Customer not found for order {}, skipping notification", order.getId());
+            return;
+        }
+
         switch (newStatus) {
-            case PAID -> sendPaymentConfirmation(order, oldStatus);
-            case CANCELLED -> sendCancellationNotice(order, oldStatus);
-            default -> log.debug("No notification needed for status change to {}", newStatus);
+            case PAID -> {
+                log.info("Sending payment confirmation to user {} for order {}", 
+                    customer.getId(), order.getId());
+                notificationService.sendOrderStatusUpdate(order, customer, "PAID - Payment Confirmed!");
+            }
+            case CANCELLED -> {
+                String reason = oldStatus == OrderStatus.PENDING ? 
+                    "due to payment failure or timeout" : "as requested";
+                log.info("Sending cancellation notice to user {} for order {} (reason: {})", 
+                    customer.getId(), order.getId(), reason);
+                notificationService.sendOrderStatusUpdate(order, customer, "CANCELLED - " + reason);
+            }
         }
     }
     
     @Override
     public boolean shouldNotify(OrderStatus oldStatus, OrderStatus newStatus) {
+        // Only notify for important status changes
         return newStatus == OrderStatus.PAID || newStatus == OrderStatus.CANCELLED;
-    }
-    
-    private void sendPaymentConfirmation(Order order, OrderStatus oldStatus) {
-        String message = String.format(
-            "Payment confirmed for order %s. Status changed from %s to PAID.", 
-            order.getId(), oldStatus
-        );
-        
-        log.info("Sending payment confirmation to user {}: {}", order.getUserId(), message);
-        // TODO: Implement actual notification logic (email, SMS, etc.)
-        // emailService.sendPaymentConfirmation(order.getUserId(), message);
-    }
-    
-    private void sendCancellationNotice(Order order, OrderStatus oldStatus) {
-        String reason = oldStatus == OrderStatus.PENDING ? 
-            "due to payment failure or timeout" : 
-            "as a refund";
-            
-        String message = String.format(
-            "Order %s has been cancelled %s. Previous status was %s.", 
-            order.getId(), reason, oldStatus
-        );
-        
-        log.info("Sending cancellation notice to user {}: {}", order.getUserId(), message);
-        // TODO: Implement actual notification logic (email, SMS, etc.)
-        // emailService.sendCancellationNotice(order.getUserId(), message);
     }
 }
