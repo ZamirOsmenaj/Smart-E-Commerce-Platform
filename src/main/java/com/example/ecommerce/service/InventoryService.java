@@ -1,9 +1,14 @@
 package com.example.ecommerce.service;
 
+import com.example.ecommerce.decorator.EcommerceNotificationService;
 import com.example.ecommerce.domain.Inventory;
+import com.example.ecommerce.domain.Product;
 import com.example.ecommerce.factory.InventoryFactory;
 import com.example.ecommerce.repository.InventoryRepository;
+import com.example.ecommerce.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,9 +20,15 @@ import java.util.UUID;
  */
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class InventoryService {
 
     private final InventoryRepository inventoryRepository;
+    private final ProductRepository productRepository;
+    private final EcommerceNotificationService notificationService;
+    
+    @Value("${inventory.low-stock-threshold:10}")
+    private int lowStockThreshold;
 
     public Inventory findById(UUID productId) {
         return inventoryRepository.findById(productId)
@@ -37,6 +48,7 @@ public class InventoryService {
 
     /**
      * Reserves a specified quantity of stock for a product.
+     * Sends low inventory alert if stock falls below threshold.
      *
      * @param productId the ID of the product
      * @param quantity  the quantity to reserve
@@ -51,8 +63,19 @@ public class InventoryService {
              throw new RuntimeException("Insufficient stock");
          }
 
-         inv.setAvailable(inv.getAvailable() - quantity);
+         int newAvailable = inv.getAvailable() - quantity;
+         inv.setAvailable(newAvailable);
          inventoryRepository.save(inv);
+         
+         // Check if we need to send low inventory alert
+         if (newAvailable <= lowStockThreshold) {
+             Product product = productRepository.findById(productId).orElse(null);
+             if (product != null) {
+                 log.warn("Low inventory detected for product {} - Current stock: {}", 
+                     product.getName(), newAvailable);
+                 notificationService.sendLowInventoryAlert(product, newAvailable, lowStockThreshold);
+             }
+         }
     }
 
     /**
