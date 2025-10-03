@@ -23,7 +23,7 @@ public class CreditCardPaymentStrategy extends AbstractPaymentProcessor {
                 order.getId(), order.getTotal());
         
         // Simulate credit card processing
-        boolean success = processCreditCardTransaction(order);
+        boolean success = processCreditCardTransaction();
         OrderStatus status = success ? OrderStatus.PAID : OrderStatus.CANCELLED;
         
         return new PaymentResponseDTO(order.getId(), status);
@@ -58,7 +58,7 @@ public class CreditCardPaymentStrategy extends AbstractPaymentProcessor {
         return "CreditCard";
     }
     
-    private boolean processCreditCardTransaction(Order order) {
+    private boolean processCreditCardTransaction() {
         // Simulate credit card processing logic
         try {
             Thread.sleep(200); // Simulate network call
