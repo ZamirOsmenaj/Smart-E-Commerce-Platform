@@ -11,21 +11,21 @@ package com.example.ecommerce.soap;
 import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlElement;
-import jakarta.xml.bind.annotation.XmlRootElement;
 import jakarta.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Java class for anonymous complex type.
+ * <p>Java class for orderItem complex type.
  * 
  * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
- * &lt;complexType&gt;
+ * &lt;complexType name="orderItem"&gt;
  *   &lt;complexContent&gt;
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
  *       &lt;sequence&gt;
- *         &lt;element name="order" type="{http://example.com/ecommerce/orders}order"/&gt;
+ *         &lt;element name="productId" type="{http://www.w3.org/2001/XMLSchema}string"/&gt;
+ *         &lt;element name="quantity" type="{http://www.w3.org/2001/XMLSchema}int"/&gt;
  *       &lt;/sequence&gt;
  *     &lt;/restriction&gt;
  *   &lt;/complexContent&gt;
@@ -35,37 +35,54 @@ import jakarta.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "", propOrder = {
-    "order"
+@XmlType(name = "orderItem", propOrder = {
+    "productId",
+    "quantity"
 })
-@XmlRootElement(name = "getOrderResponse")
-public class GetOrderResponse {
+public class OrderItem {
 
     @XmlElement(required = true)
-    protected Order order;
+    protected String productId;
+    protected int quantity;
 
     /**
-     * Gets the value of the order property.
+     * Gets the value of the productId property.
      * 
      * @return
      *     possible object is
-     *     {@link Order }
+     *     {@link String }
      *     
      */
-    public Order getOrder() {
-        return order;
+    public String getProductId() {
+        return productId;
     }
 
     /**
-     * Sets the value of the order property.
+     * Sets the value of the productId property.
      * 
      * @param value
      *     allowed object is
-     *     {@link Order }
+     *     {@link String }
      *     
      */
-    public void setOrder(Order value) {
-        this.order = value;
+    public void setProductId(String value) {
+        this.productId = value;
+    }
+
+    /**
+     * Gets the value of the quantity property.
+     * 
+     */
+    public int getQuantity() {
+        return quantity;
+    }
+
+    /**
+     * Sets the value of the quantity property.
+     * 
+     */
+    public void setQuantity(int value) {
+        this.quantity = value;
     }
 
 }

@@ -26,9 +26,7 @@
     <xs:element name="createOrderRequest">
         <xs:complexType>
             <xs:sequence>
-                <xs:element name="userId" type="xs:string"/>
-                <xs:element name="totalAmount" type="xs:decimal"/>
-                <xs:element name="status" type="xs:string"/>
+                <xs:element name="items" type="tns:orderItems"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
@@ -62,6 +60,21 @@
         </xs:complexType>
     </xs:element>
 
+    <!-- Order Items Complex Type -->
+    <xs:complexType name="orderItems">
+        <xs:sequence>
+            <xs:element name="item" type="tns:orderItem" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- Order Item Complex Type -->
+    <xs:complexType name="orderItem">
+        <xs:sequence>
+            <xs:element name="productId" type="xs:string"/>
+            <xs:element name="quantity" type="xs:int"/>
+        </xs:sequence>
+    </xs:complexType>
+
     <!-- Order Complex Type -->
     <xs:complexType name="order">
         <xs:sequence>
@@ -70,7 +83,7 @@
             <xs:element name="totalAmount" type="xs:decimal"/>
             <xs:element name="status" type="xs:string"/>
             <xs:element name="createdAt" type="xs:dateTime"/>
-            <xs:element name="updatedAt" type="xs:dateTime" minOccurs="0"/>
+            <xs:element name="items" type="tns:orderItems" minOccurs="0"/>
         </xs:sequence>
     </xs:complexType>
 
