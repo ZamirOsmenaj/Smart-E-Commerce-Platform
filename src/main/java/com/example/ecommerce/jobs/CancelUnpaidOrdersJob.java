@@ -1,7 +1,6 @@
 package com.example.ecommerce.jobs;
 
 import com.example.ecommerce.domain.Order;
-import com.example.ecommerce.observer.OrderStatusPublisher;
 import com.example.ecommerce.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,7 +36,6 @@ import java.util.List;
 public class CancelUnpaidOrdersJob implements Job {
 
     private final OrderService orderService;
-    private final OrderStatusPublisher orderStatusPublisher;
     
     @Value("${app.orders.unpaid-timeout-minutes:60}")
     private int unpaidTimeoutMinutes;
@@ -61,7 +59,7 @@ public class CancelUnpaidOrdersJob implements Job {
             log.info("Found {} unpaid orders to cancel", unpaidOrders.size());
             
             // Use service method for bulk cancellation with proper business logic
-            orderService.cancelOrders(unpaidOrders, "Automatic cancellation - payment timeout", orderStatusPublisher);
+            orderService.cancelOrders(unpaidOrders, "Automatic cancellation - payment timeout");
             
             log.info("Successfully cancelled {} unpaid orders", unpaidOrders.size());
             

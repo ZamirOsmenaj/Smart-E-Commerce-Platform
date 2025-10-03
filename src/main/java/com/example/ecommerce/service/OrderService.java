@@ -30,6 +30,7 @@ public class OrderService {
 
     private final OrderRepository orderRepository;
     private final OrderStateManager orderStateManager;
+    private final OrderStatusPublisher statusPublisher;
 
     // Command Pattern components - direct injection now that there's no cyclic dependency
     private final CommandFactory commandFactory;
@@ -79,11 +80,9 @@ public class OrderService {
      *
      * @param orders list of orders to cancel
      * @param reason the reason for cancellation
-     * @param statusPublisher the publisher to notify observers of status changes
      */
     @Transactional
-    public void cancelOrders(List<Order> orders, String reason, 
-                           OrderStatusPublisher statusPublisher) {
+    public void cancelOrders(List<Order> orders, String reason) {
         log.info("Bulk cancelling {} orders - Reason: {}", orders.size(), reason);
         
         for (Order order : orders) {
@@ -113,28 +112,6 @@ public class OrderService {
     public List<Order> findUnpaidOrdersOlderThan(Instant cutoffTime) {
         log.debug("Finding unpaid orders older than {}", cutoffTime);
         return findOrdersByStatusAndCreatedBefore(OrderStatus.PENDING, cutoffTime);
-    }
-
-    /**
-     * Cancels an order with state validation.
-     * 
-     * @deprecated Use cancelOrderWithCommand() for Command Pattern benefits
-     * @param orderId the ID of the order to cancel
-     * @param reason the reason for cancellation
-     * @return the updated order response
-     */
-    @Deprecated
-    @Transactional
-    public OrderResponseDTO cancelOrder(UUID orderId, String reason) {
-        log.warn("Using deprecated cancelOrder method - consider using cancelOrderWithCommand() instead");
-        
-        // Delegate to command-based method
-        CommandResult result = cancelOrderWithCommand(orderId, reason);
-        if (result.isSuccess()) {
-            return (OrderResponseDTO) result.getData();
-        } else {
-            throw new RuntimeException(result.getMessage());
-        }
     }
     
     /**
