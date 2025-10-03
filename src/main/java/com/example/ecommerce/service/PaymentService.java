@@ -45,8 +45,13 @@ public class PaymentService {
      * @return {@link PaymentResponseDTO}
      */
     @Transactional
-    public PaymentResponseDTO pay(UUID orderId, String provider) {
+    public PaymentResponseDTO pay(UUID orderId, String provider, UUID userId) {
         Order order = orderService.getOrderById(orderId);
+
+        // Validate that the user owns this order
+        if (!order.getUserId().equals(userId)) {
+            throw new RuntimeException("You do not own this order!");
+        }
 
         // STATE PATTERN: Validate payment operation
         orderStateManager.validateOperation(order, "payment");

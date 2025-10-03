@@ -1,10 +1,9 @@
 package com.example.ecommerce.controller;
 
 import com.example.ecommerce.constants.CommonConstants;
-import com.example.ecommerce.dto.OrderResponseDTO;
+
 import com.example.ecommerce.dto.PaymentResponseDTO;
 import com.example.ecommerce.service.JwtService;
-import com.example.ecommerce.service.OrderService;
 import com.example.ecommerce.service.PaymentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,7 +25,6 @@ public class PaymentController {
 
     private final PaymentService paymentService;
     private final JwtService jwtService;
-    private final OrderService orderService;
 
     /**
      * Initiates a payment for the specific order.
@@ -46,11 +44,6 @@ public class PaymentController {
         String jwt = authHeader.replace(CommonConstants.BEARER_PREFIX, CommonConstants.EMPTY_STRING);
         UUID userId = jwtService.extractUserId(jwt);
 
-        OrderResponseDTO order = orderService.getById(orderId);
-        if (!order.getUserId().equals(userId)) {
-            throw new RuntimeException("You do not own this order!");
-        }
-
-        return paymentService.pay(orderId, provider);
+        return paymentService.pay(orderId, provider, userId);
     }
 }
