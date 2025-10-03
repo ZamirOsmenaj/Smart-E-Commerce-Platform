@@ -4,7 +4,7 @@ import com.example.ecommerce.decorator.EcommerceNotificationService;
 import com.example.ecommerce.domain.Order;
 import com.example.ecommerce.domain.User;
 import com.example.ecommerce.domain.enums.OrderStatus;
-import com.example.ecommerce.repository.UserRepository;
+import com.example.ecommerce.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -19,11 +19,11 @@ import org.springframework.stereotype.Component;
 public class OrderNotificationObserver implements OrderStatusObserver {
     
     private final EcommerceNotificationService notificationService;
-    private final UserRepository userRepository;
+    private final UserService userService;
     
     @Override
     public void onStatusChanged(Order order, OrderStatus oldStatus, OrderStatus newStatus) {
-        User customer = userRepository.findById(order.getUserId())
+        User customer = userService.findById(order.getUserId())
                 .orElse(null);
 
         if (customer == null) {
