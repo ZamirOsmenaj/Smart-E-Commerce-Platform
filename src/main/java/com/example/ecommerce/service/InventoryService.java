@@ -1,11 +1,10 @@
 package com.example.ecommerce.service;
 
-import com.example.ecommerce.decorator.EcommerceNotificationService;
 import com.example.ecommerce.domain.Inventory;
-import com.example.ecommerce.domain.Product;
 import com.example.ecommerce.factory.InventoryFactory;
 import com.example.ecommerce.repository.InventoryRepository;
-import com.example.ecommerce.proxy.ProductServiceContract;
+import com.example.ecommerce.event.LowInventoryEvent;
+import org.springframework.context.ApplicationEventPublisher;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,8 +23,7 @@ import java.util.UUID;
 public class InventoryService {
 
     private final InventoryRepository inventoryRepository;
-    private final ProductServiceContract productService;
-    private final EcommerceNotificationService notificationService;
+    private final ApplicationEventPublisher eventPublisher;
     
     @Value("${inventory.low-stock-threshold:10}")
     private int lowStockThreshold;
@@ -66,18 +64,13 @@ public class InventoryService {
          int newAvailable = inv.getAvailable() - quantity;
          inv.setAvailable(newAvailable);
          inventoryRepository.save(inv);
-         
-         // Check if we need to send low inventory alert
-         if (newAvailable <= lowStockThreshold) {
-             try {
-                 Product product = productService.findById(productId);
-                 log.warn("Low inventory detected for product {} - Current stock: {}", 
-                     product.getName(), newAvailable);
-                 notificationService.sendLowInventoryAlert(product, newAvailable, lowStockThreshold);
-             } catch (RuntimeException e) {
-                 log.warn("Could not find product {} for low inventory alert", productId);
-             }
-         }
+
+        // Publish low inventory event if threshold reached
+        if (newAvailable <= lowStockThreshold) {
+            log.info("Publishing low inventory event for product {} - Current stock: {}",
+                    productId, newAvailable);
+            eventPublisher.publishEvent(new LowInventoryEvent(this, productId, newAvailable, lowStockThreshold));
+        }
     }
 
     /**
