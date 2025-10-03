@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Service responsible for managing user data.
@@ -47,13 +48,26 @@ public class UserService {
     }
 
     /**
-     * Finds a user by their email address.
+     * Finds a user by their email address and throws an exception if not found.
+     * This method encapsulates the validation logic within the UserService.
      *
      * @param email the email of the user to find
+     * @return the {@link User} if found
+     * @throws RuntimeException if the user is not found
+     */
+    public User findByEmail(String email) {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found!"));
+    }
+
+    /**
+     * Finds a user by their ID.
+     *
+     * @param userId the ID of the user to find
      *
      * @return an {@link Optional} containing the {@link User} if found, or empty if not
      */
-    public Optional<User> findByEmail(String email) {
-        return userRepository.findByEmail(email);
+    public Optional<User> findById(UUID userId) {
+        return userRepository.findById(userId);
     }
 }

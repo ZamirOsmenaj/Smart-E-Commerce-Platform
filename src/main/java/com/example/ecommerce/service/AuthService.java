@@ -46,8 +46,7 @@ public class AuthService {
      * @throws RuntimeException if the user does not exist or credentials are invalid
      */
     public AuthResponseDTO login(LoginRequestDTO request) {
-        User user = userService.findByEmail(request.getEmail())
-                .orElseThrow(() -> new RuntimeException("User not found!"));
+        User user = userService.findByEmail(request.getEmail());
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPasswordHash())) {
             throw new RuntimeException("Invalid credentials");
