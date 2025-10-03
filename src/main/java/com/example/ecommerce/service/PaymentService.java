@@ -1,14 +1,10 @@
 package com.example.ecommerce.service;
 
-import com.example.ecommerce.decorator.EcommerceNotificationService;
 import com.example.ecommerce.domain.Order;
-import com.example.ecommerce.domain.User;
 import com.example.ecommerce.domain.enums.OrderStatus;
 import com.example.ecommerce.dto.PaymentResponseDTO;
 import com.example.ecommerce.observer.OrderStatusPublisher;
 import com.example.ecommerce.payment.PaymentStrategy;
-import com.example.ecommerce.repository.OrderRepository;
-import com.example.ecommerce.repository.UserRepository;
 import com.example.ecommerce.state.OrderStateManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,11 +28,9 @@ public class PaymentService {
      * Populated automatically by Spring via bean injection.
      */
     private final Map<String, PaymentStrategy> strategies;
-    private final OrderRepository orderRepository;
-    private final UserRepository userRepository;
+    private final OrderService orderService;
     private final OrderStatusPublisher orderStatusPublisher;
     private final OrderStateManager orderStateManager;
-    private final EcommerceNotificationService notificationService;
 
     /**
      * Attempts to process payment for the given orderId.
@@ -52,8 +46,7 @@ public class PaymentService {
      */
     @Transactional
     public PaymentResponseDTO pay(UUID orderId, String provider) {
-        Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new RuntimeException("Order not found!"));
+        Order order = orderService.getOrderById(orderId);
 
         // STATE PATTERN: Validate payment operation
         orderStateManager.validateOperation(order, "payment");
@@ -71,21 +64,10 @@ public class PaymentService {
         // STATE PATTERN: Validate state transition
         orderStateManager.validateTransition(order, newStatus);
 
-        // Update order status
-        order.setStatus(newStatus);
-        orderRepository.save(order);
+        // Update order status through OrderService
+        orderService.updateOrderStatus(order, newStatus);
 
-        // Send payment failure notification if payment was declined
-        if (newStatus == OrderStatus.CANCELLED) {
-            User customer = userRepository.findById(order.getUserId()).orElse(null);
-            if (customer != null) {
-                log.info("Sending payment failure notification for order {} to user {}", 
-                    orderId, customer.getEmail());
-                notificationService.sendPaymentFailureNotification(order, customer, "Order has been cancelled :(");
-            }
-        }
-
-        // Notify observers of status change
+        // Notify observers of status change - this will handle payment failure notifications
         orderStatusPublisher.notifyStatusChange(order, oldStatus, newStatus);
 
         return response;

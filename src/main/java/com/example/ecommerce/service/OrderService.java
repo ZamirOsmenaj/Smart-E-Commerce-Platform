@@ -60,6 +60,25 @@ public class OrderService {
     }
 
     /**
+     * Retrieves specific order entity based on the order ID.
+     * This method is used internally by other services that need the full Order entity.
+     */
+    public Order getOrderById(UUID orderId) {
+        return orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not found!"));
+    }
+
+    /**
+     * Updates the status of an order.
+     * This method encapsulates order status updates within the OrderService.
+     */
+    @Transactional
+    public void updateOrderStatus(Order order, OrderStatus newStatus) {
+        order.setStatus(newStatus);
+        orderRepository.save(order);
+    }
+
+    /**
      * Finds orders by status and created before a specific time.
      * This method encapsulates repository access and provides a clean service layer interface.
      *
