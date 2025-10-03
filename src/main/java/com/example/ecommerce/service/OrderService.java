@@ -79,6 +79,31 @@ public class OrderService {
     }
 
     /**
+     * Finds an order by its ID and returns the entity.
+     * This method is used by SOAP endpoints and other services that need the full Order entity.
+     *
+     * @param orderId the ID of the order to find
+     * @return the Order entity
+     * @throws RuntimeException if the order is not found
+     */
+    public Order findById(UUID orderId) {
+        return orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not found!"));
+    }
+
+    /**
+     * Saves an order entity.
+     * This method encapsulates order persistence within the OrderService.
+     *
+     * @param order the order to save
+     * @return the saved order entity
+     */
+    @Transactional
+    public Order save(Order order) {
+        return orderRepository.save(order);
+    }
+
+    /**
      * Finds orders by status and created before a specific time.
      * This method encapsulates repository access and provides a clean service layer interface.
      *
