@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:tns="http://example.com/ecommerce/orders"
+           targetNamespace="http://example.com/ecommerce/orders"
+           elementFormDefault="qualified">
+
+    <!-- Order Request -->
+    <xs:element name="getOrderRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="orderId" type="xs:string"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <!-- Order Response -->
+    <xs:element name="getOrderResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="order" type="tns:order"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <!-- Create Order Request -->
+    <xs:element name="createOrderRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="userId" type="xs:string"/>
+                <xs:element name="totalAmount" type="xs:decimal"/>
+                <xs:element name="status" type="xs:string"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <!-- Create Order Response -->
+    <xs:element name="createOrderResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="order" type="tns:order"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <!-- Order Status Request -->
+    <xs:element name="updateOrderStatusRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="orderId" type="xs:string"/>
+                <xs:element name="status" type="xs:string"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <!-- Order Status Response -->
+    <xs:element name="updateOrderStatusResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="success" type="xs:boolean"/>
+                <xs:element name="message" type="xs:string"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <!-- Order Complex Type -->
+    <xs:complexType name="order">
+        <xs:sequence>
+            <xs:element name="id" type="xs:string"/>
+            <xs:element name="userId" type="xs:string"/>
+            <xs:element name="totalAmount" type="xs:decimal"/>
+            <xs:element name="status" type="xs:string"/>
+            <xs:element name="createdAt" type="xs:dateTime"/>
+            <xs:element name="updatedAt" type="xs:dateTime" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+
+</xs:schema>
