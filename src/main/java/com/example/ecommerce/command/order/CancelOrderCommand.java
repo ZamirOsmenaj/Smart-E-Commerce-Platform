@@ -8,6 +8,7 @@ import com.example.ecommerce.dto.OrderResponseDTO;
 import com.example.ecommerce.observer.OrderStatusPublisher;
 import com.example.ecommerce.repository.OrderRepository;
 import com.example.ecommerce.state.OrderStateManager;
+import com.example.ecommerce.utils.OrderMapperUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,10 +32,10 @@ public class CancelOrderCommand implements Command {
     // Command parameters
     private final UUID orderId;
     private final String reason;
-    
+
     // Store original order state for potential undo
     private OrderStatus originalStatus;
-    
+
     // Constructor for cases where OrderStateManager is not needed (like undo operations)
     public CancelOrderCommand(OrderRepository orderRepository, 
                             OrderStatusPublisher orderStatusPublisher,
@@ -80,7 +81,7 @@ public class CancelOrderCommand implements Command {
             log.info("COMMAND: Successfully cancelled order: {} (was: {}, now: {})", 
                     orderId, originalStatus, order.getStatus());
             
-            OrderResponseDTO response = mapToResponse(order);
+            OrderResponseDTO response = OrderMapperUtils.toResponse(order);
             return CommandResult.success("Order cancelled successfully", response);
             
         } catch (IllegalStateException e) {
@@ -90,25 +91,6 @@ public class CancelOrderCommand implements Command {
             log.error("COMMAND: Failed to cancel order: {} - Error: {}", orderId, e.getMessage());
             return CommandResult.failure("Failed to cancel order: " + e.getMessage(), e);
         }
-    }
-    
-    /**
-     * Maps an Order entity to its corresponding OrderResponseDTO.
-     */
-    private OrderResponseDTO mapToResponse(Order order) {
-        return OrderResponseDTO.builder()
-                .id(order.getId())
-                .userId(order.getUserId())
-                .status(order.getStatus())
-                .total(order.getTotal())
-                .items(order.getItems().stream().map(i ->
-                        OrderResponseDTO.OrderItemResponse.builder()
-                                .productId(i.getProductId())
-                                .quantity(i.getQuantity())
-                                .price(i.getPrice())
-                                .build()
-                ).toList())
-                .build();
     }
     
     @Override

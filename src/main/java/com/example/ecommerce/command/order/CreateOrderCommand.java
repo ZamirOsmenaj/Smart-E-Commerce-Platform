@@ -13,6 +13,7 @@ import com.example.ecommerce.proxy.ProductServiceContract;
 import com.example.ecommerce.repository.OrderRepository;
 import com.example.ecommerce.service.InventoryService;
 import com.example.ecommerce.service.OrderValidationService;
+import com.example.ecommerce.utils.OrderMapperUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.transaction.annotation.Transactional;
@@ -94,7 +95,7 @@ public class CreateOrderCommand implements Command {
             log.info("COMMAND: Successfully created order: {} for user: {} with total: {}", 
                     createdOrder.getId(), userId, total);
 
-            OrderResponseDTO response = mapToResponse(createdOrder);
+            OrderResponseDTO response = OrderMapperUtils.toResponse(createdOrder);
             return CommandResult.success("Order created successfully", response);
             
         } catch (Exception e) {
@@ -135,25 +136,6 @@ public class CreateOrderCommand implements Command {
             log.error("COMMAND: Failed to undo order creation for order: {} - Error: {}", createdOrder.getId(), e.getMessage());
             return CommandResult.failure("Failed to undo order creation: " + e.getMessage(), e);
         }
-    }
-    
-    /**
-     * Maps an Order entity to its corresponding OrderResponseDTO.
-     */
-    private OrderResponseDTO mapToResponse(Order order) {
-        return OrderResponseDTO.builder()
-                .id(order.getId())
-                .userId(order.getUserId())
-                .status(order.getStatus())
-                .total(order.getTotal())
-                .items(order.getItems().stream().map(i ->
-                        OrderResponseDTO.OrderItemResponse.builder()
-                                .productId(i.getProductId())
-                                .quantity(i.getQuantity())
-                                .price(i.getPrice())
-                                .build()
-                ).toList())
-                .build();
     }
     
     @Override

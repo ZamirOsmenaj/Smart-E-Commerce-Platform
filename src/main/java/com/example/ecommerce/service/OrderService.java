@@ -10,6 +10,7 @@ import com.example.ecommerce.dto.OrderResponseDTO;
 import com.example.ecommerce.observer.OrderStatusPublisher;
 import com.example.ecommerce.repository.OrderRepository;
 import com.example.ecommerce.state.OrderStateManager;
+import com.example.ecommerce.utils.OrderMapperUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -39,9 +40,10 @@ public class OrderService {
     /**
      * Retrieves specific order based on the order ID for that user
      */
+    @Transactional(readOnly = true)
     public OrderResponseDTO getById(UUID orderId) {
         return orderRepository.findById(orderId)
-                .map(this::mapToResponse)
+                .map(OrderMapperUtils::toResponse)
                 .orElseThrow(() -> new RuntimeException("Order not found!"));
     }
 
@@ -55,7 +57,7 @@ public class OrderService {
     public List<OrderResponseDTO> getOrdersByUser(UUID userId) {
         return orderRepository.findByUserId(userId)
                 .stream()
-                .map(this::mapToResponse)
+                .map(OrderMapperUtils::toResponse)
                 .toList();
     }
 
@@ -246,28 +248,5 @@ public class OrderService {
      */
     public boolean hasUndoableCommands() {
         return commandInvoker.getUndoableCommandCount() > 0;
-    }
-
-    /**
-     * Maps an {@link Order} entity to its corresponding {@link OrderResponseDTO} DTO.
-     *
-     * @param order the order entity to map
-     *
-     * @return the {@link OrderResponseDTO} representation of the order
-     */
-    private OrderResponseDTO mapToResponse(Order order) {
-        return OrderResponseDTO.builder()
-                .id(order.getId())
-                .userId(order.getUserId())
-                .status(order.getStatus())
-                .total(order.getTotal())
-                .items(order.getItems().stream().map(i ->
-                        OrderResponseDTO.OrderItemResponse.builder()
-                                .productId(i.getProductId())
-                                .quantity(i.getQuantity())
-                                .price(i.getPrice())
-                                .build()
-                ).toList())
-                .build();
     }
 }
