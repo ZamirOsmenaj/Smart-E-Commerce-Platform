@@ -1,6 +1,6 @@
 package com.example.ecommerce.service;
 
-import com.example.ecommerce.proxy.ProductServiceInterface;
+import com.example.ecommerce.proxy.ProductServiceContract;
 import com.example.ecommerce.domain.Product;
 import com.example.ecommerce.dto.CreateProductRequestDTO;
 import com.example.ecommerce.factory.ProductFactory;
@@ -18,7 +18,7 @@ import java.util.UUID;
  */
 @Service
 @RequiredArgsConstructor
-public class ProductService implements ProductServiceInterface {
+public class ProductService implements ProductServiceContract {
 
     private final ProductRepository productRepository;
     private final InventoryService inventoryService;

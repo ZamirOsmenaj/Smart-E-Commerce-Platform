@@ -1,6 +1,6 @@
 package com.example.ecommerce.config;
 
-import com.example.ecommerce.proxy.ProductServiceInterface;
+import com.example.ecommerce.proxy.ProductServiceContract;
 import com.example.ecommerce.proxy.ProductServiceCachingProxy;
 import com.example.ecommerce.service.ProductService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -24,7 +24,7 @@ public class ProxyConfig {
     @Bean
     @Primary
     @ConditionalOnProperty(name = "app.caching.enabled", havingValue = "true", matchIfMissing = true)
-    public ProductServiceInterface cachingProxy(
+    public ProductServiceContract cachingProxy(
             ProductService productService,
             RedisTemplate<String, String> redisTemplate,
             ObjectMapper objectMapper) {
@@ -40,7 +40,7 @@ public class ProxyConfig {
     @Bean
     @Primary
     @ConditionalOnProperty(name = "app.caching.enabled", havingValue = "false")
-    public ProductServiceInterface directProductService(ProductService productService) {
+    public ProductServiceContract directProductService(ProductService productService) {
         System.out.println("🚀 CREATING Direct ProductService - Caching is DISABLED");
         return productService;
     }

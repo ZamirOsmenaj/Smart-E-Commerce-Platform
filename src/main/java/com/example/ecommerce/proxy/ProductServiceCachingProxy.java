@@ -22,9 +22,9 @@ import java.util.UUID;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class ProductServiceCachingProxy implements ProductServiceInterface {
+public class ProductServiceCachingProxy implements ProductServiceContract {
     
-    private final ProductServiceInterface delegate;
+    private final ProductServiceContract delegate;
     private final RedisTemplate<String, String> redisTemplate;
     private final ObjectMapper objectMapper;
     

@@ -1,6 +1,6 @@
 package com.example.ecommerce.controller;
 
-import com.example.ecommerce.proxy.ProductServiceInterface;
+import com.example.ecommerce.proxy.ProductServiceContract;
 import com.example.ecommerce.domain.Product;
 import com.example.ecommerce.dto.CreateProductRequestDTO;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +24,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class ProductController {
 
-    private final ProductServiceInterface productService;
+    private final ProductServiceContract productService;
 
     /**
      * Retrieves all products.

@@ -1,7 +1,7 @@
 package com.example.ecommerce.validation;
 
 import com.example.ecommerce.dto.CreateOrderRequestDTO;
-import com.example.ecommerce.proxy.ProductServiceInterface;
+import com.example.ecommerce.proxy.ProductServiceContract;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class ProductExistenceValidationHandler extends OrderValidationHandler {
     
-    private final ProductServiceInterface productService;
+    private final ProductServiceContract productService;
     
     @Override
     protected ValidationResult doValidate(CreateOrderRequestDTO request) {

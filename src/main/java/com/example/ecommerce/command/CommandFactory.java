@@ -4,7 +4,7 @@ import com.example.ecommerce.command.order.CancelOrderCommand;
 import com.example.ecommerce.command.order.CreateOrderCommand;
 import com.example.ecommerce.dto.CreateOrderRequestDTO;
 import com.example.ecommerce.observer.OrderStatusPublisher;
-import com.example.ecommerce.proxy.ProductServiceInterface;
+import com.example.ecommerce.proxy.ProductServiceContract;
 import com.example.ecommerce.repository.OrderRepository;
 import com.example.ecommerce.service.InventoryService;
 import com.example.ecommerce.service.OrderValidationService;
@@ -26,7 +26,7 @@ public class CommandFactory {
     // Direct dependencies for commands
     private final OrderRepository orderRepository;
     private final InventoryService inventoryService;
-    private final ProductServiceInterface productService;
+    private final ProductServiceContract productService;
     private final OrderValidationService orderValidationService;
     private final OrderStatusPublisher orderStatusPublisher;
     private final OrderStateManager orderStateManager;
