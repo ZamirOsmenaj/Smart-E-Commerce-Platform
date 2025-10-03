@@ -14,6 +14,7 @@ import java.util.UUID;
  *  Extends {@link JpaRepository} to obtain standard CRUD operations.
  */
 public interface OrderRepository extends JpaRepository<Order, UUID> {
+
     /**
      * Retrieves all orders associated with a specific user.
      *
