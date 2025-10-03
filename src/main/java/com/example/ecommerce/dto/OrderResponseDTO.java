@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -21,6 +22,7 @@ public class OrderResponseDTO {
     private BigDecimal total;
     private OrderStatus status;
     private List<OrderItemResponse> items;
+    private Instant createdAt;
 
     /**
      * Nested DTO representing an item within an {@link OrderResponseDTO}.
