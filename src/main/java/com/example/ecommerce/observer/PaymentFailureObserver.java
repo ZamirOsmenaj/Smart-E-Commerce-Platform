@@ -23,11 +23,13 @@ public class PaymentFailureObserver implements OrderStatusObserver {
     @Override
     public void onStatusChanged(Order order, OrderStatus oldStatus, OrderStatus newStatus) {
         if (newStatus == OrderStatus.CANCELLED) {
-            User customer = userService.findById(order.getUserId()).orElse(null);
-            if (customer != null) {
+            try {
+                User customer = userService.findById(order.getUserId());
                 log.info("Sending payment failure notification for order {} to user {}", 
                     order.getId(), customer.getEmail());
                 notificationService.sendPaymentFailureNotification(order, customer, "Order has been cancelled :(");
+            } catch (RuntimeException e) {
+                log.warn("Could not send payment failure notification - user not found: {}", order.getUserId());
             }
         }
     }

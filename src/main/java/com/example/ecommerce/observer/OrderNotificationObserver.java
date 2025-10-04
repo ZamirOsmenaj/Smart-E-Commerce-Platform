@@ -23,13 +23,7 @@ public class OrderNotificationObserver implements OrderStatusObserver {
     
     @Override
     public void onStatusChanged(Order order, OrderStatus oldStatus, OrderStatus newStatus) {
-        User customer = userService.findById(order.getUserId())
-                .orElse(null);
-
-        if (customer == null) {
-            log.warn("Customer not found for order {}, skipping notification", order.getId());
-            return;
-        }
+        User customer = userService.findById(order.getUserId());
 
         switch (newStatus) {
             case PAID -> {

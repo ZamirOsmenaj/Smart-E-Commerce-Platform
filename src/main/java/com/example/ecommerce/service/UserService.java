@@ -67,7 +67,8 @@ public class UserService {
      *
      * @return an {@link Optional} containing the {@link User} if found, or empty if not
      */
-    public Optional<User> findById(UUID userId) {
-        return userRepository.findById(userId);
+    public User findById(UUID userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found!"));
     }
 }
