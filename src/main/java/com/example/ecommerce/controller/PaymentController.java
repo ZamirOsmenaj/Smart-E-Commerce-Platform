@@ -3,6 +3,7 @@ package com.example.ecommerce.controller;
 import com.example.ecommerce.constants.CommonConstants;
 
 import com.example.ecommerce.dto.PaymentResponseDTO;
+import com.example.ecommerce.security.OwnershipValidationService;
 import com.example.ecommerce.service.JwtService;
 import com.example.ecommerce.service.PaymentService;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +25,7 @@ import java.util.UUID;
 public class PaymentController {
 
     private final PaymentService paymentService;
-    private final JwtService jwtService;
+    private final OwnershipValidationService ownershipValidationService;
 
     /**
      * Initiates a payment for the specific order.
@@ -41,9 +42,8 @@ public class PaymentController {
             @PathVariable UUID orderId,
             @RequestParam(defaultValue = "mockPayment") String provider) {
 
-        String jwt = authHeader.replace(CommonConstants.BEARER_PREFIX, CommonConstants.EMPTY_STRING);
-        UUID userId = jwtService.extractUserId(jwt);
+        ownershipValidationService.validateOrderOwnership(authHeader, orderId);
 
-        return paymentService.pay(orderId, provider, userId);
+        return paymentService.pay(orderId, provider);
     }
 }
