@@ -1,6 +1,6 @@
 package com.example.ecommerce.dto;
 
-import com.example.ecommerce.domain.enums.OrderStatus;
+import com.example.ecommerce.enums.OrderStatus;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
