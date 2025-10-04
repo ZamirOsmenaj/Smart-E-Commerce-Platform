@@ -62,15 +62,6 @@ public class OrderService {
     }
 
     /**
-     * Retrieves specific order entity based on the order ID.
-     * This method is used internally by other services that need the full Order entity.
-     */
-    public Order getOrderById(UUID orderId) {
-        return orderRepository.findById(orderId)
-                .orElseThrow(() -> new RuntimeException("Order not found!"));
-    }
-
-    /**
      * Updates the status of an order.
      * This method encapsulates order status updates within the OrderService.
      */
@@ -81,8 +72,8 @@ public class OrderService {
     }
 
     /**
-     * Finds an order by its ID and returns the entity.
-     * This method is used by SOAP endpoints and other services that need the full Order entity.
+     * Retrieves specific order entity based on the order ID.
+     * This method is used internally by other components that need the full Order entity.
      *
      * @param orderId the ID of the order to find
      * @return the Order entity
@@ -101,8 +92,8 @@ public class OrderService {
      * @return the saved order entity
      */
     @Transactional
-    public Order save(Order order) {
-        return orderRepository.save(order);
+    public void save(Order order) {
+        orderRepository.save(order);
     }
 
     /**
