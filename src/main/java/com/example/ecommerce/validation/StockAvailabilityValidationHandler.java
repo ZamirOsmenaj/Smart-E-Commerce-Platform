@@ -1,6 +1,6 @@
 package com.example.ecommerce.validation;
 
-import com.example.ecommerce.dto.CreateOrderRequestDTO;
+import com.example.ecommerce.dto.request.CreateOrderRequestDTO;
 import com.example.ecommerce.service.InventoryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

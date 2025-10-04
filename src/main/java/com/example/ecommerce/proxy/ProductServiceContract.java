@@ -1,7 +1,7 @@
 package com.example.ecommerce.proxy;
 
 import com.example.ecommerce.domain.Product;
-import com.example.ecommerce.dto.CreateProductRequestDTO;
+import com.example.ecommerce.dto.request.CreateProductRequestDTO;
 
 import java.util.List;
 import java.util.UUID;

@@ -1,4 +1,4 @@
-package com.example.ecommerce.domain.enums;
+package com.example.ecommerce.enums;
 
 import com.example.ecommerce.domain.Order;
 

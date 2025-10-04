@@ -1,8 +1,8 @@
 package com.example.ecommerce.controller;
 
-import com.example.ecommerce.dto.AuthResponseDTO;
-import com.example.ecommerce.dto.LoginRequestDTO;
-import com.example.ecommerce.dto.RegisterRequestDTO;
+import com.example.ecommerce.dto.response.AuthResponseDTO;
+import com.example.ecommerce.dto.request.LoginRequestDTO;
+import com.example.ecommerce.dto.request.RegisterRequestDTO;
 import com.example.ecommerce.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;

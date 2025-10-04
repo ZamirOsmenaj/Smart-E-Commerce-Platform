@@ -1,6 +1,6 @@
 package com.example.ecommerce.security;
 
-import com.example.ecommerce.dto.OrderResponseDTO;
+import com.example.ecommerce.dto.response.OrderResponseDTO;
 import com.example.ecommerce.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

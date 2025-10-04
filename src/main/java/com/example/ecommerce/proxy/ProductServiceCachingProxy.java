@@ -1,7 +1,7 @@
 package com.example.ecommerce.proxy;
 
 import com.example.ecommerce.domain.Product;
-import com.example.ecommerce.dto.CreateProductRequestDTO;
+import com.example.ecommerce.dto.request.CreateProductRequestDTO;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;

@@ -2,9 +2,9 @@ package com.example.ecommerce.controller;
 
 import com.example.ecommerce.command.CommandResult;
 import com.example.ecommerce.constants.CommonConstants;
-import com.example.ecommerce.domain.enums.OrderStatus;
-import com.example.ecommerce.dto.CreateOrderRequestDTO;
-import com.example.ecommerce.dto.OrderResponseDTO;
+import com.example.ecommerce.enums.OrderStatus;
+import com.example.ecommerce.dto.request.CreateOrderRequestDTO;
+import com.example.ecommerce.dto.response.OrderResponseDTO;
 import com.example.ecommerce.dto.request.CancellationRequestDTO;
 import com.example.ecommerce.dto.response.ApiResponse;
 import com.example.ecommerce.dto.response.AvailableActionsResponseDTO;
@@ -137,7 +137,10 @@ public class OrderController {
         ownershipValidationService.validateOrderOwnership(token, orderId);
         
         String actions = orderService.getOrderAvailableActions(orderId);
-        AvailableActionsResponseDTO response = new AvailableActionsResponseDTO(orderId, actions);
+        AvailableActionsResponseDTO response = AvailableActionsResponseDTO.builder()
+                .orderId(orderId)
+                .actions(actions)
+                .build();
         
         return ResponseEntity.ok(ApiResponse.success(response, "Available actions retrieved successfully"));
     }

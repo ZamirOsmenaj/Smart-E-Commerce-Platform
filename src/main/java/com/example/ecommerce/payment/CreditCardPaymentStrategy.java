@@ -1,8 +1,8 @@
 package com.example.ecommerce.payment;
 
 import com.example.ecommerce.domain.Order;
-import com.example.ecommerce.domain.enums.OrderStatus;
-import com.example.ecommerce.dto.PaymentResponseDTO;
+import com.example.ecommerce.enums.OrderStatus;
+import com.example.ecommerce.dto.response.PaymentResponseDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 

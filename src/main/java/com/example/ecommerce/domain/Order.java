@@ -1,6 +1,6 @@
 package com.example.ecommerce.domain;
 
-import com.example.ecommerce.domain.enums.OrderStatus;
+import com.example.ecommerce.enums.OrderStatus;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

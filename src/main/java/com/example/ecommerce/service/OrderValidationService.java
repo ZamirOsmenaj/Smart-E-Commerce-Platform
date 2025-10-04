@@ -1,6 +1,6 @@
 package com.example.ecommerce.service;
 
-import com.example.ecommerce.dto.CreateOrderRequestDTO;
+import com.example.ecommerce.dto.request.CreateOrderRequestDTO;
 import com.example.ecommerce.validation.ItemsValidationHandler;
 import com.example.ecommerce.validation.ProductExistenceValidationHandler;
 import com.example.ecommerce.validation.StockAvailabilityValidationHandler;

@@ -1,6 +1,6 @@
 package com.example.ecommerce.state;
 
-import com.example.ecommerce.domain.enums.OrderStatus;
+import com.example.ecommerce.enums.OrderStatus;
 
 /**
  * STATE PATTERN: Concrete state for PAID orders.

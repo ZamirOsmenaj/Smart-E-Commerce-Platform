@@ -2,7 +2,7 @@ package com.example.ecommerce.service;
 
 import com.example.ecommerce.decorator.EcommerceNotificationService;
 import com.example.ecommerce.domain.User;
-import com.example.ecommerce.dto.RegisterRequestDTO;
+import com.example.ecommerce.dto.request.RegisterRequestDTO;
 import com.example.ecommerce.factory.UserFactory;
 import com.example.ecommerce.repository.UserRepository;
 import lombok.RequiredArgsConstructor;

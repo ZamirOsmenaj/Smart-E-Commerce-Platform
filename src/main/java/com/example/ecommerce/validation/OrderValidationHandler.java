@@ -1,6 +1,6 @@
 package com.example.ecommerce.validation;
 
-import com.example.ecommerce.dto.CreateOrderRequestDTO;
+import com.example.ecommerce.dto.request.CreateOrderRequestDTO;
 
 /**
  * Chain of Responsibility pattern for order validation.

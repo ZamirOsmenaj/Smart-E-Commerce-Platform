@@ -1,7 +1,7 @@
 package com.example.ecommerce.utils;
 
 import com.example.ecommerce.domain.Order;
-import com.example.ecommerce.dto.OrderResponseDTO;
+import com.example.ecommerce.dto.response.OrderResponseDTO;
 
 /**
  * Utility class which maps an {@link Order} entity to its corresponding {@link OrderResponseDTO}.

@@ -1,9 +1,9 @@
 package com.example.ecommerce.service;
 
 import com.example.ecommerce.domain.User;
-import com.example.ecommerce.dto.AuthResponseDTO;
-import com.example.ecommerce.dto.LoginRequestDTO;
-import com.example.ecommerce.dto.RegisterRequestDTO;
+import com.example.ecommerce.dto.response.AuthResponseDTO;
+import com.example.ecommerce.dto.request.LoginRequestDTO;
+import com.example.ecommerce.dto.request.RegisterRequestDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;

@@ -1,7 +1,7 @@
 package com.example.ecommerce.repository;
 
 import com.example.ecommerce.domain.Order;
-import com.example.ecommerce.domain.enums.OrderStatus;
+import com.example.ecommerce.enums.OrderStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.time.Instant;

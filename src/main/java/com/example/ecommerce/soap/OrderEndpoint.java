@@ -2,9 +2,9 @@ package com.example.ecommerce.soap;
 
 import com.example.ecommerce.command.CommandResult;
 import com.example.ecommerce.domain.Order;
-import com.example.ecommerce.domain.enums.OrderStatus;
-import com.example.ecommerce.dto.CreateOrderRequestDTO;
-import com.example.ecommerce.dto.OrderResponseDTO;
+import com.example.ecommerce.enums.OrderStatus;
+import com.example.ecommerce.dto.request.CreateOrderRequestDTO;
+import com.example.ecommerce.dto.response.OrderResponseDTO;
 import com.example.ecommerce.service.JwtService;
 import com.example.ecommerce.service.OrderService;
 import lombok.RequiredArgsConstructor;

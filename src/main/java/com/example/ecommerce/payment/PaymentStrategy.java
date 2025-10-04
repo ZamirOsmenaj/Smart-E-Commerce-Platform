@@ -1,7 +1,7 @@
 package com.example.ecommerce.payment;
 
 import com.example.ecommerce.domain.Order;
-import com.example.ecommerce.dto.PaymentResponseDTO;
+import com.example.ecommerce.dto.response.PaymentResponseDTO;
 
 /**
  * Common contract for all payment providers.

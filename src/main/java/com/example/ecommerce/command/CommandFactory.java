@@ -2,7 +2,7 @@ package com.example.ecommerce.command;
 
 import com.example.ecommerce.command.order.CancelOrderCommand;
 import com.example.ecommerce.command.order.CreateOrderCommand;
-import com.example.ecommerce.dto.CreateOrderRequestDTO;
+import com.example.ecommerce.dto.request.CreateOrderRequestDTO;
 import com.example.ecommerce.observer.OrderStatusPublisher;
 import com.example.ecommerce.proxy.ProductServiceContract;
 import com.example.ecommerce.repository.OrderRepository;

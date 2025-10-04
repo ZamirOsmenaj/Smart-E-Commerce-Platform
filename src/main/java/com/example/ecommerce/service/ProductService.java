@@ -2,7 +2,7 @@ package com.example.ecommerce.service;
 
 import com.example.ecommerce.proxy.ProductServiceContract;
 import com.example.ecommerce.domain.Product;
-import com.example.ecommerce.dto.CreateProductRequestDTO;
+import com.example.ecommerce.dto.request.CreateProductRequestDTO;
 import com.example.ecommerce.factory.ProductFactory;
 import com.example.ecommerce.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;

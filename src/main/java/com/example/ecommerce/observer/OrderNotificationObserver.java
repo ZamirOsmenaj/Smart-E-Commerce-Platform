@@ -3,7 +3,7 @@ package com.example.ecommerce.observer;
 import com.example.ecommerce.decorator.EcommerceNotificationService;
 import com.example.ecommerce.domain.Order;
 import com.example.ecommerce.domain.User;
-import com.example.ecommerce.domain.enums.OrderStatus;
+import com.example.ecommerce.enums.OrderStatus;
 import com.example.ecommerce.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

@@ -2,9 +2,8 @@ package com.example.ecommerce.controller;
 
 import com.example.ecommerce.constants.CommonConstants;
 
-import com.example.ecommerce.dto.PaymentResponseDTO;
+import com.example.ecommerce.dto.response.PaymentResponseDTO;
 import com.example.ecommerce.security.OwnershipValidationService;
-import com.example.ecommerce.service.JwtService;
 import com.example.ecommerce.service.PaymentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PathVariable;

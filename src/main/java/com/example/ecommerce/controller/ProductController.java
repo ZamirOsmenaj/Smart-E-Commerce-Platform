@@ -2,7 +2,7 @@ package com.example.ecommerce.controller;
 
 import com.example.ecommerce.proxy.ProductServiceContract;
 import com.example.ecommerce.domain.Product;
-import com.example.ecommerce.dto.CreateProductRequestDTO;
+import com.example.ecommerce.dto.request.CreateProductRequestDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
