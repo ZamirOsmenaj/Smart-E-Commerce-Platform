@@ -37,9 +37,7 @@ public class ProductService implements ProductServiceContract {
      * Retrieves a product by its unique identifier.
      *
      * @param id the UUID of the product to retrieve
-     *
      * @return the {@link Product} with the given ID
-     *
      * @throws RuntimeException if no product with the given ID exists
      */
     @Override
@@ -52,7 +50,6 @@ public class ProductService implements ProductServiceContract {
      * Creates a new product and saves it to the repository.
      *
      * @param request the {@link CreateProductRequestDTO} to create
-     *
      * @return the saved {@link Product} entity
      */
     @Transactional
@@ -67,11 +64,9 @@ public class ProductService implements ProductServiceContract {
     /**
      * Updates an existing product identified by its ID.
      *
-     * @param id      the UUID of the product to update
+     * @param id the UUID of the product to update
      * @param updated the {@link Product} object containing updated fields
-     *
      * @return the updated {@link Product} entity
-     *
      * @throws RuntimeException if no product with the given ID exists
      */
     @Transactional

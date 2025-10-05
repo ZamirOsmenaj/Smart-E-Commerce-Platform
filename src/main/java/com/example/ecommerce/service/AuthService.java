@@ -24,7 +24,6 @@ public class AuthService {
      * Registers a new user and generates a JWT token for them.
      *
      * @param request the registration request containing user credentials
-     *
      * @return an {@link AuthResponseDTO} containing the JWT token for the newly registered user
      */
     public AuthResponseDTO register(RegisterRequestDTO request) {
@@ -40,9 +39,7 @@ public class AuthService {
      * and generates a JWT token if credentials are valid.
      *
      * @param request the login request containing user credentials
-     *
      * @return an {@link AuthResponseDTO} containing the JWT token for the authenticated user
-     *
      * @throws RuntimeException if the user does not exist or credentials are invalid
      */
     public AuthResponseDTO login(LoginRequestDTO request) {

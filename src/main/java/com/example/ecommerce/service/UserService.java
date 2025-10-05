@@ -32,7 +32,6 @@ public class UserService {
      * Automatically sends welcome notification using the Decorator pattern.
      *
      * @param request the registration request containing email and password
-     *
      * @return the saved {@link User} entity
      */
     @Transactional
@@ -64,7 +63,6 @@ public class UserService {
      * Finds a user by their ID.
      *
      * @param userId the ID of the user to find
-     *
      * @return an {@link Optional} containing the {@link User} if found, or empty if not
      */
     public User findById(UUID userId) {

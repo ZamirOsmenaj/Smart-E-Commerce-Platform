@@ -28,20 +28,20 @@ public class PaymentService {
      * Populated automatically by Spring via bean injection.
      */
     private final Map<String, PaymentStrategy> strategies;
+
     private final OrderService orderService;
     private final OrderStatusPublisher orderStatusPublisher;
     private final OrderStateManager orderStateManager;
 
     /**
      * Attempts to process payment for the given orderId.
-     * If approved -> sets order status to PAID.
-     * If declined -> sets order status to CANCELLED and releases reserved stock.
+     * If approved -> sets order status to {@link OrderStatus#PAID}.
+     * If declined -> sets order status to {@link OrderStatus#CANCELLED} and releases reserved stock.
      *
      * STATE PATTERN: Validates payment operation before processing.
      *
-     * @param orderId
-     * @param provider
-     *
+     * @param orderId the ID of the order
+     * @param provider the payment provider
      * @return {@link PaymentResponseDTO}
      */
     @Transactional

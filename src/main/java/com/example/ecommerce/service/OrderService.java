@@ -38,7 +38,7 @@ public class OrderService {
     private final CommandInvoker commandInvoker;
 
     /**
-     * Retrieves specific order based on the order ID for that user
+     * Retrieves specific order based on the order ID for that user.
      */
     @Transactional(readOnly = true)
     public OrderResponseDTO getById(UUID orderId) {
@@ -51,7 +51,6 @@ public class OrderService {
      * Retrieves all orders placed by a specific user.
      *
      * @param userId the ID of the user
-     *
      * @return a list of {@link OrderResponseDTO} representing the user's orders
      */
     public List<OrderResponseDTO> getOrdersByUser(UUID userId) {
@@ -89,7 +88,6 @@ public class OrderService {
      * This method encapsulates order persistence within the OrderService.
      *
      * @param order the order to save
-     * @return the saved order entity
      */
     @Transactional
     public void save(Order order) {
@@ -102,7 +100,6 @@ public class OrderService {
      *
      * @param status the order status to filter by
      * @param cutoffTime orders created before this time
-     *
      * @return list of orders matching the criteria
      */
     public List<Order> findOrdersByStatusAndCreatedBefore(OrderStatus status,
@@ -143,7 +140,6 @@ public class OrderService {
      * Business logic method that encapsulates the criteria for "unpaid orders".
      *
      * @param cutoffTime orders created before this time are considered stale
-     *
      * @return list of unpaid orders that should be cancelled
      */
     public List<Order> findUnpaidOrdersOlderThan(Instant cutoffTime) {

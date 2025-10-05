@@ -50,7 +50,6 @@ public class InventoryService {
      *
      * @param productId the ID of the product
      * @param quantity  the quantity to reserve
-     *
      * @throws RuntimeException if no inventory exists for the product
      *                          or if available stock is insufficient
      */
@@ -78,7 +77,6 @@ public class InventoryService {
      *
      * @param productId the ID of the product
      * @param quantity  the quantity to release back into inventory
-     *
      * @throws RuntimeException if no inventory exists for the product
      */
     @Transactional
