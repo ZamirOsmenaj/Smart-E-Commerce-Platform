@@ -13,7 +13,7 @@ import java.util.UUID;
 
 /**
  * Entity representing the inventory of a product.
- * <p>
+ *
  * Tracks the number of units available for a specific product.
  */
 @Entity

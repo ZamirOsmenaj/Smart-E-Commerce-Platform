@@ -22,7 +22,7 @@ import java.util.UUID;
 
 /**
  * Entity representing a customer order.
- * <p>
+ *
  * An order is associated with a specific user and contains multiple
  * {@link OrderItem} entries.
  */

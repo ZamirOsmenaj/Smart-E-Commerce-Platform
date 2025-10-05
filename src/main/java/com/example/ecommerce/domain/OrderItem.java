@@ -18,7 +18,7 @@ import java.util.UUID;
 
 /**
  * Entity representing an item within an order.
- * <p>
+ *
  * Each item links a product to an order and specifies the
  * quantity and price at the time of purchase.
  */
