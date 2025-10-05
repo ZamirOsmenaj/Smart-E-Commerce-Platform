@@ -16,7 +16,7 @@ import java.util.UUID;
 /**
  * Caching Proxy that adds Redis-based caching to ProductService.
  * This is a PROXY PATTERN - it controls access and adds caching without changing the core functionality.
- * <p>
+ *
  * Utilizes caching to optimize performance for frequently accessed products.
  */
 @Component

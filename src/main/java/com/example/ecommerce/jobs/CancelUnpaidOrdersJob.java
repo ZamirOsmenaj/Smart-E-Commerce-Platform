@@ -22,7 +22,6 @@ import java.util.List;
  * - Configurable timeout via application properties
  * - Better error handling and logging
  *
- * <p>
  * The job uses {@link OrderService} to:
  * <ul>
  *   <li>Find unpaid orders older than the configured threshold</li>
