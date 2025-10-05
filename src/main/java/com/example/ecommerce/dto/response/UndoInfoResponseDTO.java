@@ -1,5 +1,6 @@
 package com.example.ecommerce.dto.response;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
@@ -8,6 +9,7 @@ import lombok.Data;
  */
 @Data
 @Builder
+@AllArgsConstructor
 public class UndoInfoResponseDTO {
     private int undoableCommandCount;
     private String lastUndoableCommand;

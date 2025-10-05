@@ -2,6 +2,7 @@ package com.example.ecommerce.dto.response;
 
 import com.example.ecommerce.enums.OrderStatus;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 
 import java.util.UUID;
@@ -10,6 +11,7 @@ import java.util.UUID;
  * Response payload of a payment attempt.
  */
 @Data
+@Builder
 @AllArgsConstructor
 public class PaymentResponseDTO {
 

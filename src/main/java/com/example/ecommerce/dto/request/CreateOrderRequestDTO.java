@@ -7,7 +7,7 @@ import java.util.UUID;
 
 /**
  * Request payload for creating a new order.
- * <p>
+ *
  * Contains a list of {@link Item} objects, each representing a product
  * and its desired quantity.
  */
