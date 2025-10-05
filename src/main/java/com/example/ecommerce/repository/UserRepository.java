@@ -2,6 +2,7 @@ package com.example.ecommerce.repository;
 
 import com.example.ecommerce.domain.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -11,6 +12,7 @@ import java.util.UUID;
  *
  * Extends {@link JpaRepository} to provide standard CRUD operations.
  */
+@Repository
 public interface UserRepository extends JpaRepository<User, UUID> {
 
     /**
