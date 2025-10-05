@@ -7,7 +7,7 @@ import java.util.UUID;
 
 /**
  * Repository interface for mapping {@link Inventory} entities.
- * <p>
+ *
  * Extends {@link JpaRepository} to acquire standard CRUD operations.
  */
 public interface InventoryRepository extends JpaRepository<Inventory, UUID> {

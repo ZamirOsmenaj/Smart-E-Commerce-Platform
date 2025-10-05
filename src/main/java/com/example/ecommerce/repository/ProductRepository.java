@@ -7,7 +7,7 @@ import java.util.UUID;
 
 /**
  * Repository interface for mapping {@link Product} entities.
- * <p>
+ *
  * Extends {@link JpaRepository} to inherit standard CRUD operations.
  */
 public interface ProductRepository extends JpaRepository<Product, UUID> {
