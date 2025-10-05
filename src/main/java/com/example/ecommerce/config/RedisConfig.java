@@ -10,11 +10,8 @@ import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactor
 /**
  * Configuration class for Redis caching integration.
  *
- * <p>
  * Sets up a Redis connection factory using Lettuce and enables
  * Spring's caching abstraction.
- * </p>
- *
  */
 @Configuration
 @EnableCaching
@@ -35,9 +32,7 @@ public class RedisConfig {
     /**
      * Creates a {@link LettuceConnectionFactory} for connecting to a standalone Redis instance.
      *
-     * <p>
      * This connection factory will be used by Spring's caching infrastructure.
-     * </p>
      *
      * @return a configured {@link LettuceConnectionFactory} instance
      */

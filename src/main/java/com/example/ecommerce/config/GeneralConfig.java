@@ -13,10 +13,8 @@ public class GeneralConfig {
     /**
      * Creates a {@link RestTemplate} bean for performing HTTP requests.
      *
-     * <p>
      * This bean can be injected wherever HTTP communication with external
      * services is required.
-     * </p>
      *
      * @return a new {@link RestTemplate} instance
      */

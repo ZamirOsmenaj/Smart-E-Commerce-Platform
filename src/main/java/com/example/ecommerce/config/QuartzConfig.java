@@ -12,11 +12,9 @@ import org.springframework.context.annotation.Configuration;
 /**
  * Quartz configuration for scheduling background jobs.
  *
- * <p>
  * Registers the {@link CancelUnpaidOrdersJob} as a durable job
  * and defines a trigger that executes the job every 5 minutes.
  *
- * <p>
  * This ensures that unpaid orders older than the cutoff time
  * are regularly cancelled and their reserved inventory is released.
  */

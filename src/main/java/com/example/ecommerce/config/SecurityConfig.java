@@ -14,10 +14,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 /**
  * Configuration class for application security.
  *
- * <p>
  * Defines authentication and authorization rules, JWT filtering,
  * and password encoding strategy for the application.
- * </p>
  */
 @Configuration
 @RequiredArgsConstructor
@@ -32,18 +30,14 @@ public class SecurityConfig {
     /**
      * Configures the security filter chain for the application.
      *
-     * <p>
      * - Disables CSRF protection (since the app likely uses JWT-based authentication).<br>
      * - Allows unauthenticated access to {@code /api/auth/**} endpoints.<br>
      * - Requires authentication for all other endpoints.<br>
      * - Registers the {@link JwtAuthenticationFilter} to process requests
      *   before {@link UsernamePasswordAuthenticationFilter}.
-     * </p>
      *
      * @param http the {@link HttpSecurity} to configure
-     *
      * @return the configured {@link SecurityFilterChain}
-     *
      * @throws Exception if configuration fails
      */
     @Bean
@@ -64,9 +58,7 @@ public class SecurityConfig {
      * injected where authentication is required (e.g., in controllers or services).
      *
      * @param config the {@link AuthenticationConfiguration} provided by Spring Security
-     *
      * @return the authentication manager
-     *
      * @throws Exception if retrieval fails
      */
     @Bean
@@ -77,9 +69,7 @@ public class SecurityConfig {
     /**
      * Defines the password encoder used for hashing and verifying user passwords.
      *
-     * <p>
      * Uses {@link BCryptPasswordEncoder}, which applies the BCrypt hashing algorithm.
-     * </p>
      *
      * @return the password encoder
      */
