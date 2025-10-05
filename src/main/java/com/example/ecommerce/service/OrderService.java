@@ -10,7 +10,7 @@ import com.example.ecommerce.dto.response.OrderResponseDTO;
 import com.example.ecommerce.observer.OrderStatusPublisher;
 import com.example.ecommerce.repository.OrderRepository;
 import com.example.ecommerce.state.OrderStateManager;
-import com.example.ecommerce.utils.OrderMapperUtils;
+import com.example.ecommerce.mapper.OrderMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -43,7 +43,7 @@ public class OrderService {
     @Transactional(readOnly = true)
     public OrderResponseDTO getById(UUID orderId) {
         return orderRepository.findById(orderId)
-                .map(OrderMapperUtils::toResponse)
+                .map(OrderMapper::toResponse)
                 .orElseThrow(() -> new RuntimeException("Order not found!"));
     }
 
@@ -57,7 +57,7 @@ public class OrderService {
     public List<OrderResponseDTO> getOrdersByUser(UUID userId) {
         return orderRepository.findByUserId(userId)
                 .stream()
-                .map(OrderMapperUtils::toResponse)
+                .map(OrderMapper::toResponse)
                 .toList();
     }
 

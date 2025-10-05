@@ -1,14 +1,16 @@
-package com.example.ecommerce.utils;
+package com.example.ecommerce.mapper;
 
 import com.example.ecommerce.domain.Order;
 import com.example.ecommerce.dto.response.OrderResponseDTO;
+import org.springframework.stereotype.Component;
 
 /**
  * Utility class which maps an {@link Order} entity to its corresponding {@link OrderResponseDTO}.
  */
-public class OrderMapperUtils {
+@Component
+public class OrderMapper {
 
-    private OrderMapperUtils() {} // prevent instantiation
+    private OrderMapper() {} // prevent instantiation
 
     public static OrderResponseDTO toResponse (Order order) {
         return OrderResponseDTO.builder()

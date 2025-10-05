@@ -13,7 +13,7 @@ import com.example.ecommerce.proxy.ProductServiceContract;
 import com.example.ecommerce.repository.OrderRepository;
 import com.example.ecommerce.service.InventoryService;
 import com.example.ecommerce.service.OrderValidationService;
-import com.example.ecommerce.utils.OrderMapperUtils;
+import com.example.ecommerce.mapper.OrderMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.transaction.annotation.Transactional;
@@ -95,7 +95,7 @@ public class CreateOrderCommand implements Command {
             log.info("COMMAND: Successfully created order: {} for user: {} with total: {}", 
                     createdOrder.getId(), userId, total);
 
-            OrderResponseDTO response = OrderMapperUtils.toResponse(createdOrder);
+            OrderResponseDTO response = OrderMapper.toResponse(createdOrder);
             return CommandResult.success("Order created successfully", response);
             
         } catch (Exception e) {
