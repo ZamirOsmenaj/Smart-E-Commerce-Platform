@@ -2,17 +2,18 @@ package com.example.ecommerce.mapper;
 
 import com.example.ecommerce.domain.Order;
 import com.example.ecommerce.dto.response.OrderResponseDTO;
+import lombok.NonNull;
 import org.springframework.stereotype.Component;
 
 /**
- * Utility class which maps an {@link Order} entity to its corresponding {@link OrderResponseDTO}.
+ * Mapper responsible for converting {@link Order} entities
+ * into {@link OrderResponseDTO} objects.
  */
 @Component
-public class OrderMapper {
+public class OrderMapper implements Mapper<Order, OrderResponseDTO> {
 
-    private OrderMapper() {} // prevent instantiation
-
-    public static OrderResponseDTO toResponse (Order order) {
+    @Override
+    public OrderResponseDTO toResponseDTO(@NonNull Order order) {
         return OrderResponseDTO.builder()
                 .id(order.getId())
                 .userId(order.getUserId())
