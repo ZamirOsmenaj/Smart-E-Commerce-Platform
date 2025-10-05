@@ -32,7 +32,6 @@ public class PaymentController {
      * @param authHeader the authorization header containing the JWT token
      * @param orderId    the unique identifier of the order to be paid
      * @param provider   the payment provider to use (default: {@code mockPayment})
-     *
      * @return {@link PaymentResponseDTO} representing the payment outcome
      */
     @PostMapping("/{orderId}")

@@ -40,7 +40,6 @@ public class ProductController {
      * Retrieves a product by its unique identifier.
      *
      * @param id the UUID of the product
-     *
      * @return the {@link Product} with the given ID
      */
     @GetMapping("/{id}")
@@ -52,7 +51,6 @@ public class ProductController {
      * Creates a new product.
      *
      * @param request the product details to create
-     *
      * @return the created {@link Product}
      */
     @PostMapping
@@ -65,7 +63,6 @@ public class ProductController {
      *
      * @param id the UUID of the product to update
      * @param product the updated product details
-     *
      * @return the updated {@link Product}
      */
     @PutMapping("/{id}")

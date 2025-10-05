@@ -24,7 +24,6 @@ public class AuthController {
      * Register a new user in the system and issues a token.
      *
      * @param request the registration details
-     *
      * @return an {@link AuthResponseDTO}
      */
     @PostMapping("/register")
@@ -36,7 +35,6 @@ public class AuthController {
      * Authenticates an existing user and issues a token.
      *
      * @param request the login request containing user credentials
-     *
      * @return an {@link AuthResponseDTO}
      */
     @PostMapping("/login")
