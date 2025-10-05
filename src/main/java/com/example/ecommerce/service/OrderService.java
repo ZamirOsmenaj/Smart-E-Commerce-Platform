@@ -4,13 +4,13 @@ import com.example.ecommerce.command.CommandFactory;
 import com.example.ecommerce.command.CommandInvoker;
 import com.example.ecommerce.command.CommandResult;
 import com.example.ecommerce.domain.Order;
-import com.example.ecommerce.enums.OrderStatus;
 import com.example.ecommerce.dto.request.CreateOrderRequestDTO;
 import com.example.ecommerce.dto.response.OrderResponseDTO;
+import com.example.ecommerce.enums.OrderStatus;
+import com.example.ecommerce.mapper.MapperFacade;
 import com.example.ecommerce.observer.OrderStatusPublisher;
 import com.example.ecommerce.repository.OrderRepository;
 import com.example.ecommerce.state.OrderStateManager;
-import com.example.ecommerce.mapper.OrderMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -43,7 +43,7 @@ public class OrderService {
     @Transactional(readOnly = true)
     public OrderResponseDTO getById(UUID orderId) {
         return orderRepository.findById(orderId)
-                .map(OrderMapper::toResponse)
+                .map(MapperFacade::toResponseDTO)
                 .orElseThrow(() -> new RuntimeException("Order not found!"));
     }
 
@@ -56,7 +56,7 @@ public class OrderService {
     public List<OrderResponseDTO> getOrdersByUser(UUID userId) {
         return orderRepository.findByUserId(userId)
                 .stream()
-                .map(OrderMapper::toResponse)
+                .map(MapperFacade::toResponseDTO)
                 .toList();
     }
 

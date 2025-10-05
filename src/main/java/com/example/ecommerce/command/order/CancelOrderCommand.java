@@ -3,12 +3,12 @@ package com.example.ecommerce.command.order;
 import com.example.ecommerce.command.Command;
 import com.example.ecommerce.command.CommandResult;
 import com.example.ecommerce.domain.Order;
-import com.example.ecommerce.enums.OrderStatus;
 import com.example.ecommerce.dto.response.OrderResponseDTO;
+import com.example.ecommerce.enums.OrderStatus;
+import com.example.ecommerce.mapper.MapperFacade;
 import com.example.ecommerce.observer.OrderStatusPublisher;
 import com.example.ecommerce.repository.OrderRepository;
 import com.example.ecommerce.state.OrderStateManager;
-import com.example.ecommerce.mapper.OrderMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.transaction.annotation.Transactional;
@@ -81,7 +81,7 @@ public class CancelOrderCommand implements Command {
             log.info("COMMAND: Successfully cancelled order: {} (was: {}, now: {})", 
                     orderId, originalStatus, order.getStatus());
             
-            OrderResponseDTO response = OrderMapper.toResponse(order);
+            OrderResponseDTO response = MapperFacade.toResponseDTO(order);
             return CommandResult.success("Order cancelled successfully", response);
             
         } catch (IllegalStateException e) {
