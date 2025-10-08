@@ -2,6 +2,7 @@ package com.example.ecommerce.command.order;
 
 import com.example.ecommerce.command.Command;
 import com.example.ecommerce.command.CommandResult;
+import com.example.ecommerce.constants.MessageConstants;
 import com.example.ecommerce.domain.Order;
 import com.example.ecommerce.domain.OrderItem;
 import com.example.ecommerce.dto.request.CreateOrderRequestDTO;
@@ -54,7 +55,7 @@ public class CreateOrderCommand implements Command {
             // CHAIN OF RESPONSIBILITY: Validate the order request
             var validationResult = orderValidationService.validateOrderRequest(request);
             if (!validationResult.isValid()) {
-                String errorMessage = String.format("Order validation failed: %s", 
+                String errorMessage = String.format("%s: %s", MessageConstants.ORDER_VALIDATION_FAILED,
                         String.join(", ", validationResult.getErrors()));
                 log.error("COMMAND: ORDER VALIDATION FAILED: {}", errorMessage);
                 return CommandResult.failure(errorMessage);
@@ -96,11 +97,11 @@ public class CreateOrderCommand implements Command {
                     createdOrder.getId(), userId, total);
 
             OrderResponseDTO response = MapperFacade.toResponseDTO(createdOrder);
-            return CommandResult.success("Order created successfully", response);
+            return CommandResult.success(MessageConstants.ORDER_CREATED_SUCCESS, response);
             
         } catch (Exception e) {
             log.error("COMMAND: Failed to create order for user: {} - Error: {}", userId, e.getMessage());
-            return CommandResult.failure("Failed to create order: " + e.getMessage(), e);
+            return CommandResult.failure(MessageConstants.ORDER_CREATION_FAILED + ": " + e.getMessage(), e);
         }
     }
     
@@ -108,7 +109,7 @@ public class CreateOrderCommand implements Command {
     @Transactional
     public CommandResult undo() throws Exception {
         if (createdOrder == null) {
-            return CommandResult.failure("Cannot undo: No order was created");
+            return CommandResult.failure(MessageConstants.COMMAND_UNDO_NO_ORDER);
         }
         
         try {
@@ -126,15 +127,15 @@ public class CreateOrderCommand implements Command {
             
             if (cancelResult.isSuccess()) {
                 log.info("COMMAND: Successfully undone order creation by cancelling order: {}", createdOrder.getId());
-                return CommandResult.success("Order creation undone successfully", cancelResult.getData());
+                return CommandResult.success(MessageConstants.ORDER_CREATION_UNDONE_SUCCESS, cancelResult.getData());
             } else {
                 log.error("COMMAND: Failed to undo order creation - cancel failed: {}", cancelResult.getMessage());
-                return CommandResult.failure("Failed to undo order creation: " + cancelResult.getMessage());
+                return CommandResult.failure(MessageConstants.ORDER_CREATION_UNDO_FAILED + ": " + cancelResult.getMessage());
             }
             
         } catch (Exception e) {
             log.error("COMMAND: Failed to undo order creation for order: {} - Error: {}", createdOrder.getId(), e.getMessage());
-            return CommandResult.failure("Failed to undo order creation: " + e.getMessage(), e);
+            return CommandResult.failure(MessageConstants.ORDER_CREATION_UNDO_FAILED + ": " + e.getMessage(), e);
         }
     }
     

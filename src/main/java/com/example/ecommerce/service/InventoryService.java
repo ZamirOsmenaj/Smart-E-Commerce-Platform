@@ -1,5 +1,6 @@
 package com.example.ecommerce.service;
 
+import com.example.ecommerce.constants.MessageConstants;
 import com.example.ecommerce.domain.Inventory;
 import com.example.ecommerce.factory.InventoryFactory;
 import com.example.ecommerce.repository.InventoryRepository;
@@ -30,7 +31,7 @@ public class InventoryService {
 
     public Inventory findById(UUID productId) {
         return inventoryRepository.findById(productId)
-                .orElseThrow(() -> new RuntimeException("No inventory for product " + productId));
+                .orElseThrow(() -> new RuntimeException(MessageConstants.INVENTORY_NOT_FOUND_FOR_PRODUCT + " " + productId));
     }
 
     @Transactional
@@ -57,7 +58,7 @@ public class InventoryService {
     public void reserveStock(UUID productId, int quantity) {
         Inventory inv = findById(productId);
         if (inv.getAvailable() < quantity) {
-             throw new RuntimeException("Insufficient stock");
+             throw new RuntimeException(MessageConstants.INVENTORY_INSUFFICIENT_STOCK);
          }
 
          int newAvailable = inv.getAvailable() - quantity;

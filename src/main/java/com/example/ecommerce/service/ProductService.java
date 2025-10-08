@@ -1,5 +1,6 @@
 package com.example.ecommerce.service;
 
+import com.example.ecommerce.constants.MessageConstants;
 import com.example.ecommerce.proxy.ProductServiceContract;
 import com.example.ecommerce.domain.Product;
 import com.example.ecommerce.dto.request.CreateProductRequestDTO;
@@ -43,7 +44,7 @@ public class ProductService implements ProductServiceContract {
     @Override
     public Product findById(UUID id) {
         return productRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Product not found!"));
+                .orElseThrow(() -> new RuntimeException(MessageConstants.PRODUCT_NOT_FOUND));
     }
 
     /**

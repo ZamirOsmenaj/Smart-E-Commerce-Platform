@@ -1,5 +1,6 @@
 package com.example.ecommerce.payment;
 
+import com.example.ecommerce.constants.MessageConstants;
 import com.example.ecommerce.domain.Order;
 import com.example.ecommerce.enums.OrderStatus;
 import com.example.ecommerce.dto.response.PaymentResponseDTO;
@@ -50,15 +51,15 @@ public abstract class AbstractPaymentProcessor implements PaymentStrategy {
      */
     protected void validateOrder(Order order) {
         if (order == null) {
-            throw new IllegalArgumentException("Order cannot be null");
+            throw new IllegalArgumentException(MessageConstants.ORDER_CANNOT_BE_NULL);
         }
         
         if (order.getTotal() == null || order.getTotal().compareTo(BigDecimal.ZERO) <= 0) {
-            throw new IllegalArgumentException("Order total must be greater than zero");
+            throw new IllegalArgumentException(MessageConstants.ORDER_TOTAL_INVALID);
         }
         
         if (order.getStatus() != OrderStatus.PENDING) {
-            throw new IllegalArgumentException("Order must be in PENDING status to process payment");
+            throw new IllegalArgumentException(MessageConstants.ORDER_MUST_BE_PENDING);
         }
         
         log.debug("Order validation passed for order: {}", order.getId());

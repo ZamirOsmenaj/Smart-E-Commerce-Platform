@@ -1,5 +1,6 @@
 package com.example.ecommerce.service;
 
+import com.example.ecommerce.constants.MessageConstants;
 import com.example.ecommerce.domain.User;
 import com.example.ecommerce.dto.response.AuthResponseDTO;
 import com.example.ecommerce.dto.request.LoginRequestDTO;
@@ -46,7 +47,7 @@ public class AuthService {
         User user = userService.findByEmail(request.getEmail());
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPasswordHash())) {
-            throw new RuntimeException("Invalid credentials");
+            throw new RuntimeException(MessageConstants.INVALID_CREDENTIALS);
         }
 
         String token = jwtService.generateToken(String.valueOf(user.getId()));

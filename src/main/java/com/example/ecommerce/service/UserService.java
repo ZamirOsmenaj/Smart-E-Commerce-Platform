@@ -1,5 +1,6 @@
 package com.example.ecommerce.service;
 
+import com.example.ecommerce.constants.MessageConstants;
 import com.example.ecommerce.decorator.EcommerceNotificationService;
 import com.example.ecommerce.domain.User;
 import com.example.ecommerce.dto.request.RegisterRequestDTO;
@@ -56,7 +57,7 @@ public class UserService {
      */
     public User findByEmail(String email) {
         return userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found!"));
+                .orElseThrow(() -> new RuntimeException(MessageConstants.USER_NOT_FOUND));
     }
 
     /**
@@ -67,6 +68,6 @@ public class UserService {
      */
     public User findById(UUID userId) {
         return userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found!"));
+                .orElseThrow(() -> new RuntimeException(MessageConstants.USER_NOT_FOUND));
     }
 }

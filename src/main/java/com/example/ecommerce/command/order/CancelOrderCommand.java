@@ -2,6 +2,7 @@ package com.example.ecommerce.command.order;
 
 import com.example.ecommerce.command.Command;
 import com.example.ecommerce.command.CommandResult;
+import com.example.ecommerce.constants.MessageConstants;
 import com.example.ecommerce.domain.Order;
 import com.example.ecommerce.dto.response.OrderResponseDTO;
 import com.example.ecommerce.enums.OrderStatus;
@@ -55,7 +56,7 @@ public class CancelOrderCommand implements Command {
             log.info("COMMAND: Executing CancelOrderCommand for order: {} with reason: {}", orderId, reason);
             
             Order order = orderRepository.findById(orderId)
-                    .orElseThrow(() -> new RuntimeException("Order not found!"));
+                    .orElseThrow(() -> new RuntimeException(MessageConstants.ORDER_NOT_FOUND));
             
             log.info("COMMAND: Found order {} with current status: {}", orderId, order.getStatus());
             this.originalStatus = order.getStatus();
@@ -82,14 +83,14 @@ public class CancelOrderCommand implements Command {
                     orderId, originalStatus, order.getStatus());
             
             OrderResponseDTO response = MapperFacade.toResponseDTO(order);
-            return CommandResult.success("Order cancelled successfully", response);
+            return CommandResult.success(MessageConstants.ORDER_CANCELLED_SUCCESS, response);
             
         } catch (IllegalStateException e) {
             log.warn("COMMAND: Cannot cancel order: {} - State validation failed: {}", orderId, e.getMessage());
-            return CommandResult.failure("Cannot cancel order: " + e.getMessage(), e);
+            return CommandResult.failure(MessageConstants.CANNOT_CANCEL_ORDER + ": " + e.getMessage(), e);
         } catch (Exception e) {
             log.error("COMMAND: Failed to cancel order: {} - Error: {}", orderId, e.getMessage());
-            return CommandResult.failure("Failed to cancel order: " + e.getMessage(), e);
+            return CommandResult.failure(MessageConstants.ORDER_CANCELLATION_FAILED + ": " + e.getMessage(), e);
         }
     }
     
@@ -103,7 +104,7 @@ public class CancelOrderCommand implements Command {
         // 4. Updating all related systems
         
         log.warn("COMMAND: Undo requested for CancelOrderCommand - this operation is not supported");
-        return CommandResult.failure("Undoing order cancellation is not supported for business reasons");
+        return CommandResult.failure(MessageConstants.ORDER_CANCELLATION_UNDO_NOT_SUPPORTED);
     }
     
     @Override

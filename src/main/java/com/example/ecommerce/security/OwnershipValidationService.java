@@ -1,6 +1,7 @@
 package com.example.ecommerce.security;
 
 import com.example.ecommerce.constants.CommonConstants;
+import com.example.ecommerce.constants.MessageConstants;
 import com.example.ecommerce.service.JwtService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -55,7 +56,7 @@ public class OwnershipValidationService {
     public void validateOrderOwnership(UUID userId, UUID orderId) {
         if (!orderOwnershipValidator.validateOwnership(userId, orderId)) {
             throw new OwnershipValidationException(
-                String.format("User %s does not own order %s", userId, orderId)
+                String.format("User %s %s %s", userId, MessageConstants.USER_DOES_NOT_OWN_ORDER.toLowerCase().replace("user does not own this order", "does not own order"), orderId)
             );
         }
         log.debug("SECURITY: Ownership validation successful for user {} and order {}", userId, orderId);

@@ -1,5 +1,6 @@
 package com.example.ecommerce.command;
 
+import com.example.ecommerce.constants.MessageConstants;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -27,7 +28,7 @@ public class CommandResult {
         return CommandResult.builder()
                 .success(true)
                 .data(data)
-                .message("Command executed successfully")
+                .message(MessageConstants.COMMAND_EXECUTED_SUCCESS)
                 .build();
     }
     

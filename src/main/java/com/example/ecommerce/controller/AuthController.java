@@ -1,5 +1,6 @@
 package com.example.ecommerce.controller;
 
+import com.example.ecommerce.constants.MessageConstants;
 import com.example.ecommerce.dto.response.ApiResponse;
 import com.example.ecommerce.dto.response.AuthResponseDTO;
 import com.example.ecommerce.dto.request.LoginRequestDTO;
@@ -36,10 +37,10 @@ public class AuthController {
             AuthResponseDTO authResponse = authService.register(request);
             
             log.info("AUTH CONTROLLER: User registered successfully with email: {}", request.getEmail());
-            return ResponseEntity.ok(ApiResponse.success(authResponse, "User registered successfully"));
+            return ResponseEntity.ok(ApiResponse.success(authResponse, MessageConstants.USER_REGISTERED_SUCCESS));
         } catch (Exception e) {
             log.error("AUTH CONTROLLER: User registration failed for email {}: {}", request.getEmail(), e.getMessage());
-            return ResponseEntity.badRequest().body(ApiResponse.error(e.getMessage(), "REGISTRATION_FAILED"));
+            return ResponseEntity.badRequest().body(ApiResponse.error(e.getMessage(), MessageConstants.REGISTRATION_FAILED_CODE));
         }
     }
 
@@ -55,10 +56,10 @@ public class AuthController {
             AuthResponseDTO authResponse = authService.login(request);
             
             log.info("AUTH CONTROLLER: User logged in successfully with email: {}", request.getEmail());
-            return ResponseEntity.ok(ApiResponse.success(authResponse, "User logged in successfully"));
+            return ResponseEntity.ok(ApiResponse.success(authResponse, MessageConstants.USER_LOGIN_SUCCESS));
         } catch (Exception e) {
             log.error("AUTH CONTROLLER: User login failed for email {}: {}", request.getEmail(), e.getMessage());
-            return ResponseEntity.badRequest().body(ApiResponse.error(e.getMessage(), "LOGIN_FAILED"));
+            return ResponseEntity.badRequest().body(ApiResponse.error(e.getMessage(), MessageConstants.LOGIN_FAILED_CODE));
         }
     }
 }

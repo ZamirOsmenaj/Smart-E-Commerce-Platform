@@ -1,5 +1,6 @@
 package com.example.ecommerce.security;
 
+import com.example.ecommerce.constants.MessageConstants;
 import com.example.ecommerce.dto.response.OrderResponseDTO;
 import com.example.ecommerce.service.OrderService;
 import lombok.RequiredArgsConstructor;
@@ -34,7 +35,7 @@ public class OrderOwnershipValidator implements OwnershipValidator<OrderResponse
         } catch (RuntimeException e) {
             log.error("SECURITY: Error validating ownership for order {} by user {}: {}", 
                     orderId, userId, e.getMessage());
-            throw new ResourceNotFoundException("Order not found: " + orderId, e);
+            throw new ResourceNotFoundException(MessageConstants.ORDER_NOT_FOUND + ": " + orderId, e);
         }
     }
     
@@ -43,7 +44,7 @@ public class OrderOwnershipValidator implements OwnershipValidator<OrderResponse
         try {
             return orderService.getById(orderId);
         } catch (RuntimeException e) {
-            throw new ResourceNotFoundException("Order not found: " + orderId, e);
+            throw new ResourceNotFoundException(MessageConstants.ORDER_NOT_FOUND + ": " + orderId, e);
         }
     }
 }

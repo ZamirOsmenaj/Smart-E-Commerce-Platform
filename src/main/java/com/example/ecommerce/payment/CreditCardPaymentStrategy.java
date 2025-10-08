@@ -1,5 +1,6 @@
 package com.example.ecommerce.payment;
 
+import com.example.ecommerce.constants.MessageConstants;
 import com.example.ecommerce.domain.Order;
 import com.example.ecommerce.enums.OrderStatus;
 import com.example.ecommerce.dto.response.PaymentResponseDTO;
@@ -36,7 +37,7 @@ public class CreditCardPaymentStrategy extends AbstractPaymentProcessor {
         // Additional validation for credit card payments
         if (order.getTotal().compareTo(MAX_AMOUNT) > 0) {
             throw new IllegalArgumentException(
-                "Credit card payment amount exceeds maximum limit: " + MAX_AMOUNT);
+                MessageConstants.CREDIT_CARD_MAXIMUM_LIMIT_FAILURE + ": " + MAX_AMOUNT);
         }
         
         log.debug("Credit card pre-processing completed for order: {}", order.getId());

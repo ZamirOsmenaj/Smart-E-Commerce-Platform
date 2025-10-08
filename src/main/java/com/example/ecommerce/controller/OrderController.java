@@ -2,6 +2,7 @@ package com.example.ecommerce.controller;
 
 import com.example.ecommerce.command.CommandResult;
 import com.example.ecommerce.constants.CommonConstants;
+import com.example.ecommerce.constants.MessageConstants;
 import com.example.ecommerce.enums.OrderStatus;
 import com.example.ecommerce.dto.request.CreateOrderRequestDTO;
 import com.example.ecommerce.dto.response.OrderResponseDTO;
@@ -54,7 +55,7 @@ public class OrderController {
 
         
         log.debug("ORDER CONTROLLER: Retrieved {} orders for user {}", orders.size(), userId);
-        return ResponseEntity.ok(ApiResponse.success(orders, "Orders retrieved successfully"));
+        return ResponseEntity.ok(ApiResponse.success(orders, MessageConstants.ORDER_RETRIEVED_SUCCESS));
     }
 
     /**
@@ -76,10 +77,10 @@ public class OrderController {
         
         if (result.isSuccess()) {
             log.info("ORDER CONTROLLER: Order created successfully via command pattern");
-            return ResponseEntity.ok(ApiResponse.success((OrderResponseDTO) result.getData(), "Order created successfully"));
+            return ResponseEntity.ok(ApiResponse.success((OrderResponseDTO) result.getData(), MessageConstants.ORDER_CREATED_SUCCESS));
         } else {
             log.error("ORDER CONTROLLER: Order creation failed: {}", result.getMessage());
-            return ResponseEntity.badRequest().body(ApiResponse.error(result.getMessage(), "ORDER_CREATION_FAILED"));
+            return ResponseEntity.badRequest().body(ApiResponse.error(result.getMessage(), MessageConstants.ORDER_CREATION_FAILED_CODE));
         }
     }
 
@@ -110,10 +111,10 @@ public class OrderController {
         
         if (result.isSuccess()) {
             log.info("ORDER CONTROLLER: Successfully cancelled order {} via command pattern", orderId);
-            return ResponseEntity.ok(ApiResponse.success((OrderResponseDTO) result.getData(), "Order cancelled successfully"));
+            return ResponseEntity.ok(ApiResponse.success((OrderResponseDTO) result.getData(), MessageConstants.ORDER_CANCELLED_SUCCESS));
         } else {
             log.warn("ORDER CONTROLLER: Order cancellation failed: {}", result.getMessage());
-            return ResponseEntity.badRequest().body(ApiResponse.error(result.getMessage(), "ORDER_CANCELLATION_FAILED"));
+            return ResponseEntity.badRequest().body(ApiResponse.error(result.getMessage(), MessageConstants.ORDER_CANCELLATION_FAILED_CODE));
         }
     }
 
@@ -142,7 +143,7 @@ public class OrderController {
                 .actions(actions)
                 .build();
         
-        return ResponseEntity.ok(ApiResponse.success(response, "Available actions retrieved successfully"));
+        return ResponseEntity.ok(ApiResponse.success(response, MessageConstants.ORDER_AVAILABLE_ACTIONS_SUCCESS));
     }
 
     /**
@@ -173,7 +174,7 @@ public class OrderController {
                 .canTransition(canTransition)
                 .build();
         
-        return ResponseEntity.ok(ApiResponse.success(response, "Transition check completed successfully"));
+        return ResponseEntity.ok(ApiResponse.success(response, MessageConstants.ORDER_TRANSITION_CHECK_SUCCESS));
     }
 
     /**
@@ -196,10 +197,10 @@ public class OrderController {
         
         if (result.isSuccess()) {
             log.info("ORDER CONTROLLER: Successfully undone last command for user: {}", userId);
-            return ResponseEntity.ok(ApiResponse.success(result, "Command undone successfully"));
+            return ResponseEntity.ok(ApiResponse.success(result, MessageConstants.ORDER_UNDO_SUCCESS));
         } else {
             log.warn("ORDER CONTROLLER: Failed to undo last command: {}", result.getMessage());
-            return ResponseEntity.badRequest().body(ApiResponse.error(result.getMessage(), "UNDO_FAILED"));
+            return ResponseEntity.badRequest().body(ApiResponse.error(result.getMessage(), MessageConstants.UNDO_FAILED_CODE));
         }
     }
 
@@ -235,7 +236,7 @@ public class OrderController {
         
         log.debug("ORDER CONTROLLER: Returning undo info for user: {} - {}", userId, historySummary);
         
-        return ResponseEntity.ok(ApiResponse.success(response, "Undo information retrieved successfully"));
+        return ResponseEntity.ok(ApiResponse.success(response, MessageConstants.ORDER_UNDO_INFO_SUCCESS));
     }
 
 }

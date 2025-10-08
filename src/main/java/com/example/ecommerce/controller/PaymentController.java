@@ -1,6 +1,7 @@
 package com.example.ecommerce.controller;
 
 import com.example.ecommerce.constants.CommonConstants;
+import com.example.ecommerce.constants.MessageConstants;
 import com.example.ecommerce.dto.response.ApiResponse;
 import com.example.ecommerce.dto.response.PaymentResponseDTO;
 import com.example.ecommerce.security.OwnershipValidationService;
@@ -48,10 +49,10 @@ public class PaymentController {
             PaymentResponseDTO paymentResponse = paymentService.pay(orderId, provider);
             
             log.info("PAYMENT CONTROLLER: Payment processed successfully for order {} using provider {}", orderId, provider);
-            return ResponseEntity.ok(ApiResponse.success(paymentResponse, "Payment processed successfully"));
+            return ResponseEntity.ok(ApiResponse.success(paymentResponse, MessageConstants.PAYMENT_PROCESSED_SUCCESS));
         } catch (Exception e) {
             log.error("PAYMENT CONTROLLER: Payment failed for order {}: {}", orderId, e.getMessage());
-            return ResponseEntity.badRequest().body(ApiResponse.error(e.getMessage(), "PAYMENT_FAILED"));
+            return ResponseEntity.badRequest().body(ApiResponse.error(e.getMessage(), MessageConstants.PAYMENT_FAILED_CODE));
         }
     }
 }

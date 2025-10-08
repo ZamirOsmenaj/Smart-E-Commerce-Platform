@@ -1,6 +1,7 @@
 package com.example.ecommerce.soap;
 
 import com.example.ecommerce.command.CommandResult;
+import com.example.ecommerce.constants.MessageConstants;
 import com.example.ecommerce.domain.Order;
 import com.example.ecommerce.enums.OrderStatus;
 import com.example.ecommerce.dto.request.CreateOrderRequestDTO;
@@ -56,7 +57,7 @@ public class OrderEndpoint {
             if (!orderDto.getUserId().equals(userId)) {
                 log.warn("SOAP: User {} attempted to access order {} owned by {}", 
                         userId, orderId, orderDto.getUserId());
-                throw new RuntimeException("Access denied: You do not own this order");
+                throw new RuntimeException(MessageConstants.ORDER_ACCESS_DENIED_DETAILED);
             }
             
             GetOrderResponse response = new GetOrderResponse();
@@ -66,7 +67,7 @@ public class OrderEndpoint {
             return response;
         } catch (Exception e) {
             log.error("Error processing SOAP getOrder request: {}", e.getMessage());
-            throw new RuntimeException("Order access failed: " + e.getMessage());
+            throw new RuntimeException(MessageConstants.ORDER_ACCESS_SOAP_FAILED + ": " + e.getMessage());
         }
     }
 
@@ -100,7 +101,7 @@ public class OrderEndpoint {
             
             if (!result.isSuccess()) {
                 log.error("SOAP: Order creation failed: {}", result.getMessage());
-                throw new RuntimeException("Order creation failed: " + result.getMessage());
+                throw new RuntimeException(MessageConstants.ORDER_CREATION_FAILED + ": " + result.getMessage());
             }
 
             OrderResponseDTO orderDto = (OrderResponseDTO) result.getData();
@@ -112,7 +113,7 @@ public class OrderEndpoint {
             return response;
         } catch (Exception e) {
             log.error("Error processing SOAP createOrder request: {}", e.getMessage());
-            throw new RuntimeException("Failed to create order: " + e.getMessage());
+            throw new RuntimeException(MessageConstants.ORDER_CREATION_SOAP_FAILED + ": " + e.getMessage());
         }
     }
 
@@ -138,7 +139,7 @@ public class OrderEndpoint {
             if (!orderDto.getUserId().equals(userId)) {
                 log.warn("SOAP: User {} attempted to update order {} owned by {}", 
                         userId, orderId, orderDto.getUserId());
-                throw new RuntimeException("Access denied: You do not own this order");
+                throw new RuntimeException(MessageConstants.ORDER_ACCESS_DENIED_DETAILED);
             }
             
             OrderStatus newStatus = OrderStatus.valueOf(request.getStatus().toUpperCase());
@@ -149,13 +150,13 @@ public class OrderEndpoint {
             orderService.save(order);
             
             response.setSuccess(true);
-            response.setMessage("Order status updated successfully");
+            response.setMessage(MessageConstants.ORDER_STATUS_UPDATED_SUCCESS);
             
             log.info("SOAP response sent for order status update: {}", orderId);
         } catch (Exception e) {
             log.error("Error processing SOAP updateOrderStatus request: {}", e.getMessage());
             response.setSuccess(false);
-            response.setMessage("Failed to update order status: " + e.getMessage());
+            response.setMessage(MessageConstants.ORDER_STATUS_UPDATE_FAILED + ": " + e.getMessage());
         }
         
         return response;
@@ -167,12 +168,12 @@ public class OrderEndpoint {
      */
     private UUID extractAndValidateUser(SoapHeaderElement authHeader) {
         if (authHeader == null) {
-            throw new RuntimeException("Authentication required: Missing auth token in SOAP header");
+            throw new RuntimeException(MessageConstants.AUTHENTICATION_REQUIRED + ": " + MessageConstants.MISSING_AUTH_TOKEN);
         }
         
         String token = authHeader.getText();
         if (token == null || token.trim().isEmpty()) {
-            throw new RuntimeException("Authentication required: Empty auth token");
+            throw new RuntimeException(MessageConstants.AUTHENTICATION_REQUIRED + ": " + MessageConstants.EMPTY_AUTH_TOKEN);
         }
         
         // Remove Bearer prefix if present (same as REST API)
@@ -184,7 +185,7 @@ public class OrderEndpoint {
             return jwtService.extractUserId(token);
         } catch (Exception e) {
             log.error("SOAP: JWT validation failed: {}", e.getMessage());
-            throw new RuntimeException("Authentication failed: Invalid token");
+            throw new RuntimeException(MessageConstants.AUTHENTICATION_FAILED + ": " + MessageConstants.TOKEN_INVALID);
         }
     }
 

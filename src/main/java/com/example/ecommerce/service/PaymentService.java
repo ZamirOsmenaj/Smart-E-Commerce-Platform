@@ -1,5 +1,6 @@
 package com.example.ecommerce.service;
 
+import com.example.ecommerce.constants.MessageConstants;
 import com.example.ecommerce.domain.Order;
 import com.example.ecommerce.enums.OrderStatus;
 import com.example.ecommerce.dto.response.PaymentResponseDTO;
@@ -55,7 +56,7 @@ public class PaymentService {
 
         PaymentStrategy strategy = strategies.get(provider);
         if (strategy == null) {
-            throw new IllegalArgumentException("Unknown payment provider: " + provider);
+            throw new IllegalArgumentException(MessageConstants.PAYMENT_PROVIDER_UNKNOWN + ": " + provider);
         }
 
         PaymentResponseDTO response = strategy.processPayment(order);

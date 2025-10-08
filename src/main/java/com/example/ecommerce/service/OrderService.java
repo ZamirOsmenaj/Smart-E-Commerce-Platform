@@ -3,6 +3,7 @@ package com.example.ecommerce.service;
 import com.example.ecommerce.command.CommandFactory;
 import com.example.ecommerce.command.CommandInvoker;
 import com.example.ecommerce.command.CommandResult;
+import com.example.ecommerce.constants.MessageConstants;
 import com.example.ecommerce.domain.Order;
 import com.example.ecommerce.dto.request.CreateOrderRequestDTO;
 import com.example.ecommerce.dto.response.OrderResponseDTO;
@@ -44,7 +45,7 @@ public class OrderService {
     public OrderResponseDTO getById(UUID orderId) {
         return orderRepository.findById(orderId)
                 .map(MapperFacade::toResponseDTO)
-                .orElseThrow(() -> new RuntimeException("Order not found!"));
+                .orElseThrow(() -> new RuntimeException(MessageConstants.ORDER_NOT_FOUND));
     }
 
     /**
@@ -80,7 +81,7 @@ public class OrderService {
      */
     public Order findById(UUID orderId) {
         return orderRepository.findById(orderId)
-                .orElseThrow(() -> new RuntimeException("Order not found!"));
+                .orElseThrow(() -> new RuntimeException(MessageConstants.ORDER_NOT_FOUND));
     }
 
     /**
@@ -155,7 +156,7 @@ public class OrderService {
      */
     public String getOrderAvailableActions(UUID orderId) {
         Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new RuntimeException("Order not found!"));
+                .orElseThrow(() -> new RuntimeException(MessageConstants.ORDER_NOT_FOUND));
         
         return orderStateManager.getAvailableActions(order);
     }
@@ -169,7 +170,7 @@ public class OrderService {
      */
     public boolean canOrderTransitionTo(UUID orderId, OrderStatus targetStatus) {
         Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new RuntimeException("Order not found!"));
+                .orElseThrow(() -> new RuntimeException(MessageConstants.ORDER_NOT_FOUND));
         
         return orderStateManager.canTransitionTo(order, targetStatus);
     }
