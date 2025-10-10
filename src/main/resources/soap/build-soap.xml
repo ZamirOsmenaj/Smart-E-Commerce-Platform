@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="soap-generation" default="generate-soap-classes" basedir=".">
+    
+    <description>
+        Ant build file for generating SOAP classes from XSD schema.
+        This is optional - the project works with manual classes.
+    </description>
+    
+    <!-- Properties -->
+    <property name="src.dir" value="src/main/java"/>
+    <property name="resources.dir" value="src/main/resources"/>
+    <property name="generated.dir" value="${src.dir}/com/example/ecommerce/generated"/>
+    <property name="xsd.file" value="${resources.dir}/orders.xsd"/>
+    
+    <!-- Classpath for JAXB -->
+    <path id="jaxb.classpath">
+        <fileset dir="${user.home}/.m2/repository" includes="**/*.jar"/>
+    </path>
+    
+    <!-- Clean generated classes -->
+    <target name="clean-generated">
+        <description>Clean previously generated SOAP classes</description>
+        <delete dir="${generated.dir}" failonerror="false"/>
+        <echo message="Cleaned generated SOAP classes"/>
+    </target>
+    
+    <!-- Generate SOAP classes from XSD -->
+    <target name="generate-soap-classes" depends="clean-generated">
+        <description>Generate JAXB classes from XSD schema</description>
+        
+        <!-- Create output directory -->
+        <mkdir dir="${generated.dir}"/>
+        
+        <!-- Generate classes using xjc -->
+        <exec executable="xjc" failonerror="true">
+            <arg value="-d"/>
+            <arg value="${src.dir}"/>
+            <arg value="-p"/>
+            <arg value="com.example.ecommerce.soap"/>
+            <arg value="${xsd.file}"/>
+        </exec>
+        
+        <echo message="Generated SOAP classes in: ${src.dir}/com/example/ecommerce/soap"/>
+        <echo message="Package: com.example.ecommerce.soap"/>
+    </target>
+    
+    <!-- Validate XSD schema -->
+    <target name="validate-xsd">
+        <description>Validate the XSD schema file</description>
+        <schemavalidate>
+            <schema file="${xsd.file}"/>
+        </schemavalidate>
+        <echo message="XSD schema is valid"/>
+    </target>
+    
+    <!-- Generate WSDL documentation -->
+    <target name="generate-docs">
+        <description>Generate documentation from WSDL (requires running application)</description>
+        <echo message="WSDL available at: http://localhost:8080/ws/orders.wsdl"/>
+        <echo message="Use SOAP UI or similar tools to generate documentation"/>
+    </target>
+    
+    <!-- Help target -->
+    <target name="help">
+        <description>Display available targets</description>
+        <echo message="Available targets:"/>
+        <echo message="  generate-soap-classes : Generate JAXB classes from XSD"/>
+        <echo message="  clean-generated      : Clean generated classes"/>
+        <echo message="  validate-xsd         : Validate XSD schema"/>
+        <echo message="  generate-docs        : Show WSDL documentation info"/>
+        <echo message="  help                 : Show this help"/>
+    </target>
+    
+</project>
