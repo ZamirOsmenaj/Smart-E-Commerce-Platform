@@ -95,8 +95,6 @@ The application will be available at `http://localhost:8080`
 - **[Testing Guide](docs/TESTING_GUIDE.md)** - Setup and testing instructions
 - **[Development Guide](docs/DEVELOPMENT_GUIDE.md)** - Development workflow and best practices
 - **[Commands Reference](COMMANDS.md)** - Ready-to-use API commands
-- **[Development Guide](docs/DEVELOPMENT_GUIDE.md)** - Development workflow and best practices
-- **[Commands Reference](COMMANDS.md)** - Ready-to-use API commands
 
 ## 🔧 API Overview
 
