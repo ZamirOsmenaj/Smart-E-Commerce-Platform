@@ -58,7 +58,6 @@ The Smart E-Commerce Platform is a sophisticated Spring Boot application that de
 | Testing Guide | 1 | Setup and testing instructions |
 | Development Guide | 1 | Development workflow |
 | Commands Reference | 1 | Ready-to-use cURL commands |
-| Message System Guide | 1 | Centralized message management |
 
 ## 🎨 Design Patterns Showcase
 
