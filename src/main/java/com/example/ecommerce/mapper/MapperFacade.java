@@ -17,9 +17,7 @@ public final class MapperFacade {
     private static final OrderMapper orderMapper = new OrderMapper();
     private static final ProductMapper productMapper = new ProductMapper();
 
-    private MapperFacade() {
-        throw new UnsupportedOperationException("Utility class");
-    }
+    private MapperFacade() {}
 
     public static OrderResponseDTO toResponseDTO(@NonNull Order order) {
         return orderMapper.toResponseDTO(order);

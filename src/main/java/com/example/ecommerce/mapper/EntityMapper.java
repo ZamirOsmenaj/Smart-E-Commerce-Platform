@@ -25,9 +25,7 @@ public final class EntityMapper {
     /**
      * Private constructor to prevent instantiation.
      */
-    private EntityMapper() {
-        throw new UnsupportedOperationException("Utility class");
-    }
+    private EntityMapper() {}
 
     /**
      * Converts an {@link Order} entity into an {@link OrderResponseDTO}.
