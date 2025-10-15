@@ -53,7 +53,7 @@ spring.application.name=ecommerce
 
 ## Database & Persistence
 
-### PostgreSQL 15
+### PostgreSQL
 **Purpose**: Primary relational database  
 **Why Chosen**:
 - ACID compliance for financial transactions
@@ -64,7 +64,7 @@ spring.application.name=ecommerce
 **Configuration** (docker-compose.yml):
 ```yaml
 postgres:
-  image: postgres:15
+  image: postgres
   environment:
     POSTGRES_USER: postgres
     POSTGRES_PASSWORD: postgres

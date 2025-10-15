@@ -110,18 +110,6 @@ The application will be available at `http://localhost:8080`
 
 ## 🏃‍♂️ Development Workflow
 
-### Local Development
-```bash
-# Install dependencies
-./mvnw clean install
-
-# Run locally (requires PostgreSQL and Redis)
-./mvnw spring-boot:run
-
-# Run tests
-./mvnw test
-```
-
 ### Key Configuration
 - **Environment Variables**: See `docker-compose.yml`
 - **Application Properties**: `src/main/resources/application.properties`
@@ -185,6 +173,7 @@ curl http://localhost:8080/actuator/health
 - **OpenShift Deployment** - Enterprise container platform
 - **Decision Tables** - Business rule management
 - **Microservices Architecture** - Service decomposition
+- **Multi-environment profiles** - Manage configuration across multiple environments 
 
 ## 📈 Project Status
 
@@ -200,11 +189,7 @@ curl http://localhost:8080/actuator/health
 ### In Progress 🚧
 - Unit and integration tests
 - Performance optimization
-- Documentation completion
-
-## 🤝 Contributing
-
-This project serves as a comprehensive example of design pattern implementation in Spring Boot. See the [Development Guide](docs/DEVELOPMENT_GUIDE.md) for contribution guidelines.
+- Multi-environment profiles configuration
 
 ## 📄 License
 
