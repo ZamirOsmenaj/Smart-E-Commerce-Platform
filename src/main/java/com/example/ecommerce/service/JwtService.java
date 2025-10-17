@@ -35,8 +35,8 @@ public class JwtService {
      * @param secret the JWT signing secret, injected from configuration
      * @param expiration the token expiration time in milliseconds, injected from configuration
      */
-    public JwtService(@Value("${jwt.secret}") String secret,
-                      @Value("${jwt.expiration}") long expiration) {
+    public JwtService(@Value("${spring.jwt.secret}") String secret,
+                      @Value("${spring.jwt.expiration}") long expiration) {
         this.secret = secret;
         this.expiration = expiration;
     }
