@@ -42,25 +42,60 @@ This project demonstrates a comprehensive implementation of design patterns in a
 - Docker and Docker Compose
 - Java 17+ (for local development)
 
-### Running with Docker
+### Multi-Environment Deployment
+
+This application supports multiple deployment environments using Docker Compose with environment-specific configuration files:
+
+#### Development Environment
 ```bash
 # Clone the repository
 git clone <repository-url>
 cd smart-ecommerce-platform
 
-# Start all services
-docker-compose up -d
+# Deploy to development environment
+docker compose --env-file .env.dev up --build
 
-# Verify services are running
-docker-compose ps
+# Or run in detached mode
+docker compose --env-file .env.dev up -d --build
 ```
 
-The application will be available at `http://localhost:8080`
+#### UAT Environment
+```bash
+# Deploy to UAT environment
+docker compose --env-file .env.uat up --build
+```
+
+#### Production Environment
+```bash
+# Deploy to production environment
+docker compose --env-file .env.prod up --build
+```
+
+### Environment Configuration Files
+
+Each environment uses its own configuration file:
+- **`.env.dev`** - Development environment variables
+- **`.env.uat`** - UAT environment variables  
+- **`.env.prod`** - Production environment variables
 
 ### Services
 - **Application**: `http://localhost:8080`
 - **PostgreSQL**: `localhost:5432`
 - **Redis**: `localhost:6379`
+
+### Verify Deployment
+```bash
+# Check running services
+docker compose ps
+
+# View application logs
+docker compose logs app
+
+# Health check
+curl http://localhost:8080/actuator/health
+```
+
+For detailed deployment instructions, environment configuration, and troubleshooting, see the [Deployment Guide](DEPLOYMENT.md).
 
 ## 🛠️ Technology Stack
 
@@ -96,6 +131,51 @@ The application will be available at `http://localhost:8080`
 - **[Development Guide](docs/DEVELOPMENT_GUIDE.md)** - Development workflow and best practices
 - **[Commands Reference](COMMANDS.md)** - Ready-to-use API commands
 
+## 🌍 Environment Setup
+
+### Environment Variables Configuration
+
+Each environment requires specific configuration through `.env` files:
+
+#### Development (.env.dev)
+- Local database and Redis instances
+- Debug logging enabled
+- Relaxed security for testing
+- All payment gateways enabled
+
+#### UAT (.env.uat)
+- UAT database and Redis instances
+- INFO level logging
+- Production-like security settings
+- Audit logging enabled
+
+#### Production (.env.prod)
+- Production database and Redis cluster
+- WARN level logging for performance
+- Full security measures enabled
+- Optimized caching and performance settings
+
+### Required Environment Variables
+
+All environments require these variables in their respective `.env` files:
+```bash
+# Database Configuration
+SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5432/ecommerce_dev
+SPRING_DATASOURCE_USERNAME=your_username
+SPRING_DATASOURCE_PASSWORD=your_password
+
+# Redis Configuration
+SPRING_REDIS_HOST=localhost
+SPRING_REDIS_PORT=6379
+
+# JWT Configuration
+JWT_SECRET=your_jwt_secret_key
+JWT_EXPIRATION=86400000
+
+# Application Configuration
+SPRING_PROFILES_ACTIVE=dev
+```
+
 ## 🔧 API Overview
 
 ### REST Endpoints
@@ -111,9 +191,10 @@ The application will be available at `http://localhost:8080`
 ## 🏃‍♂️ Development Workflow
 
 ### Key Configuration
-- **Environment Variables**: See `docker-compose.yml`
-- **Application Properties**: `src/main/resources/application.properties`
-- **Database Migrations**: `src/main/resources/db/changelog/`
+- **Environment Variables**: See `.env.dev`, `.env.uat`, `.env.prod` files
+- **Application Properties**: `src/main/resources/application-{profile}.yml`
+- **Database Migrations**: `src/main/resources/db/changelog/{environment}/`
+- **Docker Compose**: Uses environment variables from `.env` files
 
 ## 🎯 Key Features
 
@@ -173,7 +254,6 @@ curl http://localhost:8080/actuator/health
 - **OpenShift Deployment** - Enterprise container platform
 - **Decision Tables** - Business rule management
 - **Microservices Architecture** - Service decomposition
-- **Multi-environment profiles** - Manage configuration across multiple environments 
 
 ## 📈 Project Status
 
@@ -185,11 +265,11 @@ curl http://localhost:8080/actuator/health
 - Redis caching system
 - Centralized message management
 - Comprehensive error handling
+- Multi-environment deployment profiles
 
 ### In Progress 🚧
 - Unit and integration tests
 - Performance optimization
-- Multi-environment profiles configuration
 
 ## 📄 License
 
@@ -212,3 +292,4 @@ This project is for educational and demonstration purposes.
 | [Testing Guide](docs/TESTING_GUIDE.md) | Setup, testing, and interaction guide |
 | [Development Guide](docs/DEVELOPMENT_GUIDE.md) | Development workflow and best practices |
 | [Commands Reference](COMMANDS.md) | Ready-to-use cURL commands |
+| [Deployment Guide](DEPLOYMENT.md) | Multi-environment deployment instructions |

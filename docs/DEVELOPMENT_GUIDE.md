@@ -54,7 +54,7 @@ docker-compose up -d postgres redis
 
 ### Environment Variables for Development
 ```bash
-# Create .env file for local development
+# Create .env.dev file for local development
 SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5432/ecommerce
 SPRING_DATASOURCE_USERNAME=postgres
 SPRING_DATASOURCE_PASSWORD=postgres
